@@ -53,19 +53,45 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IRepository.cs" />
+    <Compile Include="Contracts\IUnitOfWork.cs" />
+    <Compile Include="DataConstants.cs" />
     <Compile Include="IdentityModels\RoleStore.cs" />
     <Compile Include="IdentityModels\UserClaim.cs" />
     <Compile Include="IdentityModels\UserLogin.cs" />
+    <Compile Include="ModelConfigurations\AnswerConfiguraiton.cs" />
+    <Compile Include="ModelConfigurations\CategoryConfiguration.cs" />
+    <Compile Include="ModelConfigurations\QuestionConfiguration.cs" />
+    <Compile Include="ModelConfigurations\SubCategoryConfiguration.cs" />
+    <Compile Include="ModelConfigurations\TagQuestionConfiguration.cs" />
+    <Compile Include="ModelConfigurations\UserAnswerConfiguration.cs" />
+    <Compile Include="ModelConfigurations\UserCommentConfiguration.cs" />
+    <Compile Include="ModelConfigurations\UserConfiguration.cs" />
+    <Compile Include="ModelConfigurations\UserQuestionConfiguration.cs" />
+    <Compile Include="Models\Answer.cs" />
+    <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\Direction.cs" />
+    <Compile Include="Models\Question.cs" />
     <Compile Include="Models\Role.cs" />
+    <Compile Include="Models\SubCategory.cs" />
+    <Compile Include="Models\Tag.cs" />
+    <Compile Include="Models\TagQuestion.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="IdentityModels\UserStore.cs" />
+    <Compile Include="Models\UserAnswerVote.cs" />
+    <Compile Include="Models\UserCommentVote.cs" />
     <Compile Include="Models\UserRole.cs" />
+    <Compile Include="Models\UserQuestionVote.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\Repository.cs" />
     <Compile Include="TitaniumForumDbContext.cs" />
+    <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2,6 +2,7 @@
 {
     using IdentityModels;
     using Microsoft.AspNet.Identity.EntityFramework;
+    using ModelConfigurations;
     using Models;
     using System.Data.Entity;
 
@@ -12,25 +13,31 @@
         {
         }
 
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<SubCategory> SubCategories { get; set; }
+
+        public DbSet<Question> Questions { get; set; }
+
+        public DbSet<Answer> Answers { get; set; }
+
+        public DbSet<Comment> Comments { get; set; }
+
+        public DbSet<Tag> Tags { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder
-                .Entity<UserRole>()
-                .HasKey(ur => new { ur.UserId, ur.RoleId });
-
-            builder
-                .Entity<User>()
-                .HasMany(u => u.Roles)
-                .WithRequired(ur => ur.User)
-                .HasForeignKey(ur => ur.UserId);
-
-            builder
-                .Entity<Role>()
-                .HasMany(r => r.Users)
-                .WithRequired(ur => ur.Role)
-                .HasForeignKey(ur => ur.RoleId);
+            builder.Configurations.Add(new TagQuestionConfiguration());
+            builder.Configurations.Add(new UserAnswerConfiguration());
+            builder.Configurations.Add(new UserCommentConfiguration());
+            builder.Configurations.Add(new UserQuestionConfiguration());
+            builder.Configurations.Add(new UserConfiguration());
+            builder.Configurations.Add(new CategoryConfiguration());
+            builder.Configurations.Add(new SubCategoryConfiguration());
+            builder.Configurations.Add(new QuestionConfiguration());
+            builder.Configurations.Add(new AnswerConfiguraiton());
         }
 
         public static TitaniumForumDbContext Create()

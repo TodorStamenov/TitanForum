@@ -1,7 +1,8 @@
 ﻿using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartupAttribute(typeof(TitaniumForum.Web.Startup))]
+[assembly: OwinStartup(typeof(TitaniumForum.Web.Startup))]
+
 namespace TitaniumForum.Web
 {
     public partial class Startup
