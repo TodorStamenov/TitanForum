@@ -11,6 +11,9 @@
             this.HasMany(q => q.Answers)
                 .WithRequired(a => a.Question)
                 .HasForeignKey(a => a.QuestionId);
+
+            this.HasIndex(q => q.Title)
+                .IsUnique(true);
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿namespace TitaniumForum.Web.Controllers
 {
+    using Common;
     using Data.Models;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.Owin;
     using Microsoft.Owin.Security;
     using Models.Account;
+    using System.IO;
     using System.Threading.Tasks;
     using System.Web;
     using System.Web.Mvc;
@@ -105,7 +107,12 @@
         {
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = model.Username };
+                var user = new User
+                {
+                    UserName = model.Username,
+                    Email = model.Email,
+                    ProfileImage = CommonConstants.defaultUserImage
+                };
 
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -117,7 +124,6 @@
                 AddErrors(result);
             }
 
-            // If we got this far, something failed, redisplay form
             return View(model);
         }
 

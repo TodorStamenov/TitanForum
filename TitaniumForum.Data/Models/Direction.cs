@@ -2,7 +2,7 @@
 {
     public enum Direction
     {
-        Up = 0,
-        Down = 1
+        Like = 0,
+        Dislike = 1
     }
 }

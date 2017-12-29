@@ -12,6 +12,8 @@
         [MinLength(DataConstants.AnswerConstants.MinContentLength)]
         public string Content { get; set; }
 
+        public int Rating { get; set; }
+
         public DateTime DateAdded { get; set; }
 
         public int QuestionId { get; set; }

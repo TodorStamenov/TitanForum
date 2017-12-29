@@ -2,6 +2,7 @@
 {
     using IdentityModels;
     using Microsoft.AspNet.Identity.EntityFramework;
+    using Migrations;
     using ModelConfigurations;
     using Models;
     using System.Data.Entity;
@@ -11,6 +12,7 @@
         public TitaniumForumDbContext()
             : base("data source=.;initial catalog=TitaniumForum;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
         {
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<TitaniumForumDbContext, Configuration>());
         }
 
         public DbSet<Category> Categories { get; set; }
@@ -29,6 +31,7 @@
         {
             base.OnModelCreating(builder);
 
+            builder.Configurations.Add(new TagConfiguration());
             builder.Configurations.Add(new TagQuestionConfiguration());
             builder.Configurations.Add(new UserAnswerConfiguration());
             builder.Configurations.Add(new UserCommentConfiguration());

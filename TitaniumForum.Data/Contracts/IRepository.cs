@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public interface IRepository<TEntity> : IEnumerable<TEntity> where TEntity : class
+    public interface IRepository<TEntity> where TEntity : class
     {
         void Add(TEntity entity);
 

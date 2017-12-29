@@ -59,10 +59,16 @@
     <Compile Include="IdentityModels\RoleStore.cs" />
     <Compile Include="IdentityModels\UserClaim.cs" />
     <Compile Include="IdentityModels\UserLogin.cs" />
+    <Compile Include="Migrations\201712291354555_InitialCreate.cs" />
+    <Compile Include="Migrations\201712291354555_InitialCreate.Designer.cs">
+      <DependentUpon>201712291354555_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelConfigurations\AnswerConfiguraiton.cs" />
     <Compile Include="ModelConfigurations\CategoryConfiguration.cs" />
     <Compile Include="ModelConfigurations\QuestionConfiguration.cs" />
     <Compile Include="ModelConfigurations\SubCategoryConfiguration.cs" />
+    <Compile Include="ModelConfigurations\TagConfiguration.cs" />
     <Compile Include="ModelConfigurations\TagQuestionConfiguration.cs" />
     <Compile Include="ModelConfigurations\UserAnswerConfiguration.cs" />
     <Compile Include="ModelConfigurations\UserCommentConfiguration.cs" />
@@ -92,6 +98,16 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\TitaniumForum.Common\TitaniumForum.Common.csproj">
+      <Project>{8f0c54af-4625-4418-8d33-fffc7c42d0bd}</Project>
+      <Name>TitaniumForum.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201712291354555_InitialCreate.resx">
+      <DependentUpon>201712291354555_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,7 +1,6 @@
 ﻿namespace TitaniumForum.Data.Repositories
 {
     using Contracts;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -42,16 +41,6 @@
         public IQueryable<TEntity> All()
         {
             return this.context.Set<TEntity>().AsQueryable();
-        }
-
-        public IEnumerator<TEntity> GetEnumerator()
-        {
-            return this.context.Set<TEntity>().AsEnumerable().GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
         }
     }
 }

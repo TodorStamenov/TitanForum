@@ -10,6 +10,9 @@
             this.HasMany(c => c.SubCategories)
                 .WithRequired(sc => sc.Category)
                 .HasForeignKey(sc => sc.CategoryId);
+
+            this.HasIndex(c => c.Name)
+                .IsUnique(true);
         }
     }
 }
