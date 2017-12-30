@@ -1,20 +1,23 @@
 namespace TitaniumForum.Data.Migrations
 {
     using Common;
-    using IdentityModels;
+    using Data.Models;
     using Microsoft.AspNet.Identity;
-    using Models;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using System;
     using System.Collections.Generic;
+    using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using System.Threading.Tasks;
+    using TitaniumForum.Data.IdentityModels;
 
     internal sealed class Configuration : DbMigrationsConfiguration<TitaniumForumDbContext>
     {
         private const int AdminsCount = 1;
         private const int ModeratorsCount = 3;
-        private const int UsersCount = 100;
-        private const int CategoriesCount = 5;
+        private const int UsersCount = 50;
+        private const int CategoriesCount = 3;
         private const int SubCategoriesCount = CategoriesCount * 5;
         private const int QuestionsCount = SubCategoriesCount * 5;
         private const int AnswersCount = QuestionsCount * 5;
@@ -36,75 +39,85 @@ namespace TitaniumForum.Data.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
-            AutomaticMigrationDataLossAllowed = false;
+            AutomaticMigrationDataLossAllowed = true;
         }
 
         protected override void Seed(TitaniumForumDbContext context)
         {
-            UserManager<User, int> userManager = new UserManager<User, int>(new UserStore(context));
+            var roleStore = new RoleStore<Role, int, UserRole>(context);
+            var roleManager = new RoleManager<Role, int>(roleStore);
 
-            if (!context.Roles.Any())
+            var userStore = new UserStore<User, Role, int, UserLogin, UserRole, UserClaim>(context);
+            var userManager = new UserManager<User, int>(userStore);
+
+            userManager.PasswordValidator = new PasswordValidator()
             {
-                this.SeedRoles(context);
+                RequiredLength = 3,
+                RequireNonLetterOrDigit = false,
+                RequireDigit = false,
+                RequireLowercase = false,
+                RequireUppercase = false
+            };
+
+            Task.Run(async () =>
+            {
+                await SeedRolesAsync(roleManager, context);
+                await SeedUsersAsync(userManager, UsersCount, context);
+                await SeedUsersAsync(userManager, roleManager, AdminsCount, CommonConstants.AdminRole, context);
+                await SeedUsersAsync(userManager, roleManager, ModeratorsCount, CommonConstants.ModeratorRole, context);
+                await SeedCategoriesAsync(CategoriesCount, context);
+                await SeedSubCategoriesAsync(SubCategoriesCount, context);
+                await SeedTagsAsync(TagsCount, context);
+                await SeedQuestionsAsync(QuestionsCount, context);
+                await SeedAnswersAsync(AnswersCount, context);
+                await SeedCommentsAsync(CommentsCount, context);
+            })
+            .GetAwaiter()
+            .GetResult();
+        }
+
+        private static async Task SeedRolesAsync(RoleManager<Role, int> roleManager, TitaniumForumDbContext context)
+        {
+            if (await context.Roles.AnyAsync())
+            {
+                return;
             }
 
-            if (!context.Users.Any())
+            await roleManager.CreateAsync(new Role { Name = CommonConstants.AdminRole });
+            await roleManager.CreateAsync(new Role { Name = CommonConstants.ModeratorRole });
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedUsersAsync(UserManager<User, int> userManager, int usersCount, TitaniumForumDbContext context)
+        {
+            if (await context.Users.AnyAsync(u => !u.Roles.Any()))
             {
-                this.SeedUsers(UsersCount, userManager, context);
+                return;
             }
 
-            if (!context.Users.Any(u => u.Roles.Any(r => r.Role.Name == CommonConstants.AdminRole)))
+            for (int i = 1; i <= usersCount; i++)
             {
-                this.SeedUsers(AdminsCount, CommonConstants.AdminRole, userManager, context);
-            }
+                string username = $"Username{i}";
 
-            if (!context.Users.Any(u => u.Roles.Any(r => r.Role.Name == CommonConstants.ModeratorRole)))
-            {
-                this.SeedUsers(ModeratorsCount, CommonConstants.ModeratorRole, userManager, context);
-            }
+                User user = new User
+                {
+                    UserName = username,
+                    Email = $"{username}@{username}.com",
+                    ProfileImage = CommonConstants.defaultUserImage
+                };
 
-            if (!context.Categories.Any())
-            {
-                this.SeedCategories(CategoriesCount, context);
-            }
-
-            if (!context.SubCategories.Any())
-            {
-                this.SeedSubCategories(SubCategoriesCount, context);
-            }
-
-            if (!context.Tags.Any())
-            {
-                this.SeedTags(TagsCount, context);
-            }
-
-            if (!context.Questions.Any())
-            {
-                this.SeedQuestions(QuestionsCount, context);
-            }
-
-            if (!context.Answers.Any())
-            {
-                this.SeedAnswers(AnswersCount, context);
-            }
-
-            if (!context.Comments.Any())
-            {
-                this.SeedComments(CommentsCount, context);
+                await userManager.CreateAsync(user, "123");
+                await context.SaveChangesAsync();
             }
         }
 
-        private void SeedRoles(TitaniumForumDbContext context)
+        private static async Task SeedUsersAsync(UserManager<User, int> userManager, RoleManager<Role, int> roleManager, int usersCount, string role, TitaniumForumDbContext context)
         {
-            context.Roles.Add(new Role { Name = CommonConstants.AdminRole });
-            context.Roles.Add(new Role { Name = CommonConstants.ModeratorRole });
-
-            context.SaveChanges();
-        }
-
-        private void SeedUsers(int usersCount, string role, UserManager<User, int> userManager, TitaniumForumDbContext context)
-        {
-            int roleId = context.Roles.FirstOrDefault(r => r.Name == role).Id;
+            if (await context.Users.AnyAsync(u => u.Roles.Any(r => r.Role.Name == role)))
+            {
+                return;
+            }
 
             for (int i = 1; i <= usersCount; i++)
             {
@@ -114,41 +127,23 @@ namespace TitaniumForum.Data.Migrations
                 {
                     UserName = username,
                     Email = $"{username}@{username}.com",
-                    PasswordHash = userManager.PasswordHasher.HashPassword("123"),
                     ProfileImage = CommonConstants.defaultUserImage
                 };
 
-                context.Users.Add(user);
-                user.Roles.Add(new UserRole
-                {
-                    RoleId = roleId
-                });
+                await userManager.CreateAsync(user, "123");
+                await userManager.AddToRoleAsync(user.Id, role);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private void SeedUsers(int usersCount, UserManager<User, int> userManager, TitaniumForumDbContext context)
+        private static async Task SeedCategoriesAsync(int categoriesCount, TitaniumForumDbContext context)
         {
-            for (int i = 1; i <= usersCount; i++)
+            if (await context.Categories.AnyAsync())
             {
-                string username = $"Username{i}";
-
-                User user = new User
-                {
-                    UserName = username,
-                    Email = $"{username}@{username}.com",
-                    PasswordHash = userManager.PasswordHasher.HashPassword("123")
-                };
-
-                context.Users.Add(user);
+                return;
             }
 
-            context.SaveChanges();
-        }
-
-        private void SeedCategories(int categoriesCount, TitaniumForumDbContext context)
-        {
             for (int i = 1; i <= categoriesCount; i++)
             {
                 context.Categories.Add(new Category
@@ -157,12 +152,17 @@ namespace TitaniumForum.Data.Migrations
                 });
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private void SeedSubCategories(int subCategoriesCount, TitaniumForumDbContext context)
+        private static async Task SeedSubCategoriesAsync(int subCategoriesCount, TitaniumForumDbContext context)
         {
-            List<int> categoryIds = context.Categories.Select(c => c.Id).ToList();
+            if (await context.SubCategories.AnyAsync())
+            {
+                return;
+            }
+
+            List<int> categoryIds = await context.Categories.Select(c => c.Id).ToListAsync();
 
             for (int i = 1; i <= subCategoriesCount; i++)
             {
@@ -173,11 +173,16 @@ namespace TitaniumForum.Data.Migrations
                 });
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private void SeedTags(int tagsCount, TitaniumForumDbContext context)
+        private static async Task SeedTagsAsync(int tagsCount, TitaniumForumDbContext context)
         {
+            if (await context.Tags.AnyAsync())
+            {
+                return;
+            }
+
             for (int i = 1; i <= TagsCount; i++)
             {
                 context.Tags.Add(new Tag
@@ -186,14 +191,19 @@ namespace TitaniumForum.Data.Migrations
                 });
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private void SeedQuestions(int questionsCount, TitaniumForumDbContext context)
+        private static async Task SeedQuestionsAsync(int questionsCount, TitaniumForumDbContext context)
         {
-            List<int> subCategoryIds = context.SubCategories.Select(c => c.Id).ToList();
-            List<int> userIds = context.Users.Select(u => u.Id).ToList();
-            List<int> tagIds = context.Tags.Select(u => u.Id).ToList();
+            if (await context.Questions.AnyAsync())
+            {
+                return;
+            }
+
+            List<int> subCategoryIds = await context.SubCategories.Select(c => c.Id).ToListAsync();
+            List<int> userIds = await context.Users.Select(u => u.Id).ToListAsync();
+            List<int> tagIds = await context.Tags.Select(u => u.Id).ToListAsync();
 
             for (int i = 1; i <= questionsCount; i++)
             {
@@ -254,20 +264,26 @@ namespace TitaniumForum.Data.Migrations
                 context.Questions.Add(question);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private void SeedAnswers(int answersCount, TitaniumForumDbContext context)
+        private static async Task SeedAnswersAsync(int answersCount, TitaniumForumDbContext context)
         {
-            List<int> userIds = context.Users.Select(u => u.Id).ToList();
-            var questionInfo = context
+            if (await context.Answers.AnyAsync())
+            {
+                return;
+            }
+
+            List<int> userIds = await context.Users.Select(u => u.Id).ToListAsync();
+            var questionInfo = await context
                 .Questions
+
                 .Select(q => new
                 {
                     q.Id,
                     q.DateAdded
                 })
-                .ToList();
+                .ToListAsync();
 
             for (int i = 0; i < answersCount; i++)
             {
@@ -310,20 +326,26 @@ namespace TitaniumForum.Data.Migrations
                 context.Answers.Add(answer);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        private void SeedComments(int commentsCount, TitaniumForumDbContext context)
+        private static async Task SeedCommentsAsync(int commentsCount, TitaniumForumDbContext context)
         {
-            List<int> userIds = context.Users.Select(u => u.Id).ToList();
-            var answerInfo = context
+            if (await context.Comments.AnyAsync())
+            {
+                return;
+            }
+
+            List<int> userIds = await context.Users.Select(u => u.Id).ToListAsync();
+            var answerInfo = await context
                 .Answers
+
                 .Select(q => new
                 {
                     q.Id,
                     q.DateAdded
                 })
-                .ToList();
+                .ToListAsync();
 
             for (int i = 0; i < commentsCount; i++)
             {
@@ -366,7 +388,7 @@ namespace TitaniumForum.Data.Migrations
                 context.Comments.Add(comment);
             }
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

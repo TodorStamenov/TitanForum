@@ -38,6 +38,11 @@
             return this.context.Set<TEntity>().Find(id);
         }
 
+        public TEntity Find(int firstKey, int secondKey)
+        {
+            return this.context.Set<TEntity>().Find(firstKey, secondKey);
+        }
+
         public IQueryable<TEntity> All()
         {
             return this.context.Set<TEntity>().AsQueryable();

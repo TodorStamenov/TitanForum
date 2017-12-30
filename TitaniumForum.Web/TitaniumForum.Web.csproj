@@ -218,14 +218,23 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\Admin\Models\Logs\ListLogsViewModel.cs" />
+    <Compile Include="Areas\Admin\Models\Users\ListUsersViewModel.cs" />
+    <Compile Include="Areas\Admin\Models\Users\UserRoleEditViewModel.cs" />
     <Compile Include="Areas\Moderator\ModeratorAreaRegistration.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\Extensions\KernelExtensions.cs" />
+    <Compile Include="Infrastructure\Extensions\TempDataDictionaryExtensions.cs" />
+    <Compile Include="Infrastructure\Filters\LogAttribute.cs" />
+    <Compile Include="Infrastructure\Helpers\BasePageViewModel.cs" />
+    <Compile Include="Infrastructure\Helpers\ControllerHelpers.cs" />
     <Compile Include="Infrastructure\Mapping\AutoMapperProfile.cs" />
     <Compile Include="Infrastructure\WebConstants.cs" />
     <Compile Include="Models\Account\LoginViewModel.cs" />
@@ -259,6 +268,10 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Areas\Admin\Views\web.config" />
     <Content Include="Areas\Moderator\Views\web.config" />
+    <Content Include="Areas\Admin\Views\Users\EditRoles.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Logs.cshtml" />
+    <Content Include="Areas\Admin\Views\Users\Users.cshtml" />
+    <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -296,8 +309,6 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Admin\Controllers\" />
-    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\Admin\Views\Shared\" />
     <Folder Include="Areas\Moderator\Controllers\" />
     <Folder Include="Areas\Moderator\Models\" />

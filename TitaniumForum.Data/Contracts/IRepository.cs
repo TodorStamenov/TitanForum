@@ -15,6 +15,8 @@
 
         TEntity Find(int id);
 
+        TEntity Find(int firstKey, int secondKey);
+
         IQueryable<TEntity> All();
     }
 }

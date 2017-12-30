@@ -6,7 +6,6 @@
     using Microsoft.AspNet.Identity.Owin;
     using Microsoft.Owin.Security;
     using Models.Account;
-    using System.IO;
     using System.Threading.Tasks;
     using System.Web;
     using System.Web.Mvc;
@@ -14,41 +13,25 @@
     [Authorize]
     public class AccountController : Controller
     {
-        private ApplicationSignInManager _signInManager;
-        private ApplicationUserManager _userManager;
+        private ApplicationSignInManager signInManager;
+        private ApplicationUserManager userManager;
+        private IAuthenticationManager authManager;
 
-        public AccountController()
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, IAuthenticationManager authManager)
         {
-        }
-
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
-        {
-            UserManager = userManager;
-            SignInManager = signInManager;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.authManager = authManager;
         }
 
         public ApplicationSignInManager SignInManager
         {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set
-            {
-                _signInManager = value;
-            }
+            get { return this.signInManager; }
         }
 
         public ApplicationUserManager UserManager
         {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
+            get { return this.userManager; }
         }
 
         //
@@ -141,16 +124,16 @@
         {
             if (disposing)
             {
-                if (_userManager != null)
+                if (userManager != null)
                 {
-                    _userManager.Dispose();
-                    _userManager = null;
+                    userManager.Dispose();
+                    userManager = null;
                 }
 
-                if (_signInManager != null)
+                if (signInManager != null)
                 {
-                    _signInManager.Dispose();
-                    _signInManager = null;
+                    signInManager.Dispose();
+                    signInManager = null;
                 }
             }
 
@@ -164,10 +147,7 @@
 
         private IAuthenticationManager AuthenticationManager
         {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
+            get { return this.authManager; }
         }
 
         private void AddErrors(IdentityResult result)

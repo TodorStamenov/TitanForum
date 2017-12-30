@@ -19,7 +19,7 @@
                     Implementation = t
                 })
                 .ToList()
-                .ForEach(s => services.Bind(s.Interface, s.Implementation));
+                .ForEach(s => services.Bind(s.Interface).To(s.Implementation));
 
             return services;
         }

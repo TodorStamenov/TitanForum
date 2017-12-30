@@ -1,6 +1,5 @@
 ﻿namespace TitaniumForum.Web
 {
-    using Data;
     using Data.Models;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.Owin;
@@ -13,10 +12,6 @@
     {
         public void ConfigureAuth(IAppBuilder app)
         {
-            app.CreatePerOwinContext(TitaniumForumDbContext.Create);
-            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
-            app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
-
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,

@@ -1,0 +1,75 @@
+﻿@model UserRoleEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Roles";
+    string notProvidedMessage = "Not Provided";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2>@ViewData["Title"] for @Model.User.Username</h2>
+        <img class="site-image" src="@Model.User.ProfileImage" alt="Avatar" width="250" height="250" />
+        <h3>Email: @(Model.User.Email == null ? notProvidedMessage : Model.User.Email)</h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <table class="table table-hover table-striped text-center">
+            <thead>
+                <tr>
+                    <th class="text-center">Role</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var role in Model.Roles)
+                {
+                    <tr>
+                        <td>@role.Name</td>
+                        <td>
+                            @if (Model.User.Roles.Any(r => r.Name == role.Name))
+                            {
+                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="RemoveRole">
+                                    <input type="hidden" name="userId" value="@Model.User.Id" />
+                                    <input type="hidden" name="roleName" value="@role.Name" />
+                                    <input class="btn btn-default" type="submit" value="Remove From Role" />
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="AddRole">
+                                    <input type="hidden" name="userId" value="@Model.User.Id" />
+                                    <input type="hidden" name="roleName" value="@role.Name" />
+                                    <input class="btn btn-success" type="submit" value="Add To Role" />
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.User.Roles.Any(r => r.Name == CommonConstants.AdminRole))
+                {
+                    <tr>
+                        <td>Lock Account</td>
+                        <td>
+                            @if (Model.IsUserLocked)
+                            {
+                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="Unlock">
+                                    <input type="hidden" name="userId" value="@Model.User.Id" />
+                                    <input class="btn btn-success" type="submit" value="Unlock" />
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="Lock">
+                                    <input type="hidden" name="userId" value="@Model.User.Id" />
+                                    <input class="btn btn-warning" type="submit" value="Lock" />
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

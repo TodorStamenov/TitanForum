@@ -42,10 +42,5 @@
             builder.Configurations.Add(new QuestionConfiguration());
             builder.Configurations.Add(new AnswerConfiguraiton());
         }
-
-        public static TitaniumForumDbContext Create()
-        {
-            return new TitaniumForumDbContext();
-        }
     }
 }

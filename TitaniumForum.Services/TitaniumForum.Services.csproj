@@ -33,7 +33,20 @@
     <Reference Include="AutoMapper, Version=6.2.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.6.2.2\lib\net45\AutoMapper.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
@@ -44,24 +57,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Areas\Admin\IAdminUserService.cs" />
+    <Compile Include="Areas\Admin\Implementations\AdminUserService.cs" />
+    <Compile Include="Areas\Admin\Models\Roles\RoleServiceModel.cs" />
+    <Compile Include="Areas\Admin\Models\Users\UserRolesServiceModel.cs" />
+    <Compile Include="Infrastructure\Extensions\UserExtensions.cs" />
     <Compile Include="IService.cs" />
+    <Compile Include="Models\Users\ListUsersServiceModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Infrastructure\ServiceConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TitaniumForum.Common\TitaniumForum.Common.csproj">
       <Project>{8f0c54af-4625-4418-8d33-fffc7c42d0bd}</Project>
       <Name>TitaniumForum.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TitaniumForum.Data\TitaniumForum.Data.csproj">
+      <Project>{A2EA1E3D-E48A-4074-974C-C0C962FF2919}</Project>
+      <Name>TitaniumForum.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Admin\Implementations\" />
-    <Folder Include="Areas\Admin\Models\" />
+    <Folder Include="Areas\Admin\Models\Logs\" />
     <Folder Include="Areas\Moderator\Implementations\" />
     <Folder Include="Areas\Moderator\Models\" />
     <Folder Include="Implementations\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
