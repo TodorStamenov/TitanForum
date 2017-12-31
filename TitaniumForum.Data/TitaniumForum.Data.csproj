@@ -63,6 +63,10 @@
     <Compile Include="Migrations\201712291354555_InitialCreate.Designer.cs">
       <DependentUpon>201712291354555_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712311028064_LogsTable.cs" />
+    <Compile Include="Migrations\201712311028064_LogsTable.Designer.cs">
+      <DependentUpon>201712311028064_LogsTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelConfigurations\AnswerConfiguraiton.cs" />
     <Compile Include="ModelConfigurations\CategoryConfiguration.cs" />
@@ -78,6 +82,8 @@
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Direction.cs" />
+    <Compile Include="Models\Log.cs" />
+    <Compile Include="Models\LogType.cs" />
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\SubCategory.cs" />
@@ -107,6 +113,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201712291354555_InitialCreate.resx">
       <DependentUpon>201712291354555_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712311028064_LogsTable.resx">
+      <DependentUpon>201712311028064_LogsTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

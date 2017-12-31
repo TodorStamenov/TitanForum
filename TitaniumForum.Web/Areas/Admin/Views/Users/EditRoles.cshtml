@@ -2,14 +2,14 @@
 
 @{
     ViewData["Title"] = "Edit Roles";
-    string notProvidedMessage = "Not Provided";
 }
 
 <div class="row">
     <div class="col-md-8">
-        <h2>@ViewData["Title"] for @Model.User.Username</h2>
+        <br />
         <img class="site-image" src="@Model.User.ProfileImage" alt="Avatar" width="250" height="250" />
-        <h3>Email: @(Model.User.Email == null ? notProvidedMessage : Model.User.Email)</h3>
+        <h3>Email: @Model.User.Email</h3>
+        <h3>Username: @Model.User.Username</h3>
     </div>
 </div>
 <hr />

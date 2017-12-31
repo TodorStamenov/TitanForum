@@ -10,6 +10,7 @@
     using System;
     using System.Threading.Tasks;
     using System.Web.Mvc;
+    using TitaniumForum.Web.Areas.Admin.Models.Logs;
     using Web.Controllers;
 
     [RouteArea(WebConstants.AdminArea)]
@@ -136,27 +137,27 @@
             return RedirectToAction(nameof(EditRoles), new { id = userId });
         }
 
-        //public ActionResult Logs(int page, string search)
-        //{
-        //    if (page <= 0)
-        //    {
-        //        page = 1;
-        //    }
+        public ActionResult Logs(int? page, string search)
+        {
+            if (page == null || page <= 0)
+            {
+                page = 1;
+            }
 
-        //    search = search ?? string.Empty;
+            search = search ?? string.Empty;
 
-        //    int totalLogs = this.userService.Total(search);
+            int totalLogs = this.userService.Total(search);
 
-        //    ListLogsViewModel model = new ListLogsViewModel
-        //    {
-        //        Search = search,
-        //        CurrentPage = page,
-        //        TotalPages = ControllerHelpers.GetTotalPages(totalLogs, LogsPerPage),
-        //        Logs = this.userService.Logs(page, LogsPerPage, search),
-        //    };
+            ListLogsViewModel model = new ListLogsViewModel
+            {
+                Search = search,
+                CurrentPage = (int)page,
+                TotalPages = ControllerHelpers.GetTotalPages(totalLogs, LogsPerPage),
+                Logs = this.userService.Logs((int)page, LogsPerPage, search),
+            };
 
-        //    return View(model);
-        //}
+            return View(model);
+        }
 
         public ActionResult Users(int? page, string userRole, string search)
         {

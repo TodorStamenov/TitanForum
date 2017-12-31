@@ -10,18 +10,20 @@
 <div class="row">
     <h2>@ViewData["Title"] @(Model.UserRole != null ? $"in Role {Model.UserRole}" : string.Empty)</h2>
 
-    <form class="form-inline" asp-area="Admin" asp-controller="Users" asp-action="Users">
-        <input type="hidden" asp-for="UserRole" />
-        <input class="form-control" asp-for="Search" placeholder="Search..." />
+    @using (Html.BeginForm("Users", "Users", new { area = "Admin" }, FormMethod.Post, new { @class = "form-inline" }))
+    {
+
+        @Html.HiddenFor(m => m.UserRole)
+        @Html.TextBoxFor(m => m.Search, new { @class = "form-control", placeholder = "Search..." })
         <input class="btn btn-success" type="submit" value="Search" />
-    </form>
+    }
     <br />
 
-    <a class="btn btn-primary" asp-area="Admin" asp-controller="Users" asp-action="Users">All Users</a>
+    <a href="@Url.Action("Users", "Users", new { area = "Admin" })" class="btn btn-primary">All Users</a>
 
     @foreach (var role in Model.Roles)
     {
-        <a class="btn btn-primary" asp-area="Admin" asp-controller="Users" asp-action="Users" asp-route-userRole="@role.Name">@role.Name</a>
+        <a href="@Url.Action("Users", "Users", new { area = "Admin", userRole = role.Name })" class="btn btn-primary">@role.Name</a>
     }
     <table class="table table-hover table-striped">
         <thead>
@@ -38,7 +40,7 @@
                     <td>@user.Username</td>
                     <td>@user.Email</td>
                     <td>
-                        <a asp-area="Admin" asp-controller="Users" asp-action="EditRoles" asp-route-id="@user.Id" class="btn btn-primary">Manage</a>
+                        <a href="@Url.Action("EditRoles", "Users", new { area = "Admin", id = user.Id })" class="btn btn-primary">Manage</a>
                     </td>
                 </tr>
             }
@@ -62,7 +64,7 @@
                 </li>
             }
             <li class="page-item">
-                <a class="page-link @nextDisabled" asp-area="Admin" asp-controller="Users" asp-action="Users" asp-route-page="@Model.NextPage" asp-route-userRole="@userRole" asp-route-search="@Model.Search" aria-label="Next">
+                <a class="page-link @nextDisabled" href="@Url.Action("Users", "Users", new { area = "Admin", page = Model.NextPage, userRole = userRole, search = Model.Search})" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                     <span class="sr-only">Next</span>
                 </a>

@@ -4,12 +4,15 @@
     using Data;
     using Data.Models;
     using Infrastructure.Extensions;
+    using Models.Logs;
     using Models.Roles;
     using Models.Users;
     using Services.Models.Users;
+    using System;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
+    using TitaniumForum.Services.Infrastructure;
 
     public class AdminUserService : IAdminUserService
     {
@@ -24,31 +27,29 @@
         {
             return this.db
                 .Users
-                .All()
                 .Where(u => u.Id == id)
                 .Select(u => u.UserName)
                 .FirstOrDefault();
         }
 
-        //public void Log(string username, LogType logType, string tableName)
-        //{
-        //    Log log = new Log
-        //    {
-        //        User = username,
-        //        LogType = logType,
-        //        TableName = tableName,
-        //        TimeStamp = DateTime.UtcNow
-        //    };
+        public void Log(string username, LogType logType, string tableName)
+        {
+            Log log = new Log
+            {
+                User = username,
+                LogType = logType,
+                TableName = tableName,
+                TimeStamp = DateTime.UtcNow
+            };
 
-        //    this.db.Logs.Add(log);
-        //    this.db.SaveChanges();
-        //}
+            this.db.Logs.Add(log);
+            this.db.Save();
+        }
 
         public bool AddToRole(int userId, string roleName)
         {
             var userRoleInfo = this.db
                 .Roles
-                .All()
                 .Where(r => r.Name == roleName)
                 .Select(r => new
                 {
@@ -79,7 +80,6 @@
         {
             var userRoleInfo = this.db
                 .Roles
-                .All()
                 .Where(r => r.Name == roleName)
                 .Select(r => new
                 {
@@ -104,19 +104,19 @@
             return true;
         }
 
-        //public int Total(string search)
-        //{
-        //    return this.db
-        //        .Logs
-        //        .Where(l => l.User.ToLower().Contains(search.ToLower()))
-        //        .Count();
-        //}
+        public int Total(string search)
+        {
+            return this.db
+                .Logs
+                .Where(l => l.User.ToLower().Contains(search.ToLower()))
+                .Count();
+        }
 
         public int Total(string role, string search)
         {
             return this.db
                 .Users
-                .All()
+                .AllEntries()
                 .Filter(search)
                 .InRole(role)
                 .Count();
@@ -126,29 +126,41 @@
         {
             return this.db
                 .Users
-                .All()
                 .Where(u => u.Id == id)
-                .ProjectTo<UserRolesServiceModel>()
+                .Select(u => new UserRolesServiceModel
+                {
+                    Id = u.Id,
+                    Username = u.UserName,
+                    Email = u.Email,
+                    ProfileImage = ServiceConstants.DataImage + Convert.ToBase64String(u.ProfileImage),
+                    Roles = u.Roles
+                        .Select(r => new RoleServiceModel
+                        {
+                            Id = r.RoleId,
+                            Name = r.Role.Name
+                        })
+                })
                 .FirstOrDefault();
         }
 
-        //public IEnumerable<ListLogsServiceModel> Logs(int page, int itemsPerPage, string search)
-        //{
-        //    return this.db
-        //        .Logs
-        //        .Where(l => l.User.ToLower().Contains(search.ToLower()))
-        //        .OrderByDescending(l => l.TimeStamp)
-        //        .Skip((page - 1) * itemsPerPage)
-        //        .Take(itemsPerPage)
-        //        .ProjectTo<ListLogsServiceModel>()
-        //        .ToList();
-        //}
+        public IEnumerable<ListLogsServiceModel> Logs(int page, int itemsPerPage, string search)
+        {
+            return this.db
+                .Logs
+                .AllEntries()
+                .Where(l => l.User.ToLower().Contains(search.ToLower()))
+                .OrderByDescending(l => l.TimeStamp)
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
+                .ProjectTo<ListLogsServiceModel>()
+                .ToList();
+        }
 
         public IEnumerable<RoleServiceModel> AllRoles()
         {
             return this.db
                 .Roles
-                .All()
+                .AllEntries()
                 .ProjectTo<RoleServiceModel>()
                 .ToList();
         }
@@ -157,7 +169,7 @@
         {
             return this.db
                 .Users
-                .All()
+                .AllEntries()
                 .Include(u => u.Roles)
                 .Filter(search)
                 .InRole(role)

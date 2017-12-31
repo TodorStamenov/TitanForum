@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Areas\Admin\IAdminUserService.cs" />
     <Compile Include="Areas\Admin\Implementations\AdminUserService.cs" />
+    <Compile Include="Areas\Admin\Models\Logs\ListLogsServiceModel.cs" />
     <Compile Include="Areas\Admin\Models\Roles\RoleServiceModel.cs" />
     <Compile Include="Areas\Admin\Models\Users\UserRolesServiceModel.cs" />
     <Compile Include="Infrastructure\Extensions\UserExtensions.cs" />
@@ -78,7 +79,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Admin\Models\Logs\" />
     <Folder Include="Areas\Moderator\Implementations\" />
     <Folder Include="Areas\Moderator\Models\" />
     <Folder Include="Implementations\" />

@@ -22,40 +22,40 @@
             </tr>
         </thead>
         <tbody>
-            @*@foreach (var log in Model.Logs)
-                {
-                    <tr>
-                        <td>@log.User</td>
-                        <td>@log.TableName</td>
-                        <td>@log.LogType.ToString()</td>
-                        <td>@log.TimeStamp</td>
-                    </tr>
-                }*@
+            @foreach (var log in Model.Logs)
+            {
+                <tr>
+                    <td>@log.User</td>
+                    <td>@log.TableName</td>
+                    <td>@log.LogType.ToString()</td>
+                    <td>@log.TimeStamp</td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
-@*@if (Model.Logs.Any())
-    {
-        <div class="row">
-            <ul class="pagination">
-                <li class="page-item">
-                    <a class="page-link @previouseDisabled" asp-area="Admin" asp-controller="Users" asp-action="Logs" asp-route-page="@Model.PrevPage" asp-route-search="@Model.Search" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                        <span class="sr-only">Previous</span>
-                    </a>
+@if (Model.Logs.Any())
+{
+    <div class="row">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link @previouseDisabled" asp-area="Admin" asp-controller="Users" asp-action="Logs" asp-route-page="@Model.PrevPage" asp-route-search="@Model.Search" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            @for (int i = Model.FirstPage; i <= Model.LastPage; i++)
+            {
+                <li class="page-item @(Model.CurrentPage == i ? "active" : string.Empty)">
+                    <a class="page-link @(Model.CurrentPage == i ? "disabled" : string.Empty)" asp-area="Admin" asp-controller="Users" asp-action="Logs" asp-route-page="@i" asp-route-search="@Model.Search">@i</a>
                 </li>
-                @for (int i = Model.FirstPage; i <= Model.LastPage; i++)
-                {
-                    <li class="page-item @(Model.CurrentPage == i ? "active" : string.Empty)">
-                        <a class="page-link @(Model.CurrentPage == i ? "disabled" : string.Empty)" asp-area="Admin" asp-controller="Users" asp-action="Logs" asp-route-page="@i" asp-route-search="@Model.Search">@i</a>
-                    </li>
-                }
-                <li class="page-item">
-                    <a class="page-link @nextDisabled" asp-area="Admin" asp-controller="Users" asp-action="Logs" asp-route-page="@Model.NextPage" asp-route-search="@Model.Search" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    }*@
+            }
+            <li class="page-item">
+                <a class="page-link @nextDisabled" asp-area="Admin" asp-controller="Users" asp-action="Logs" asp-route-page="@Model.NextPage" asp-route-search="@Model.Search" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+}

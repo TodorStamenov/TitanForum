@@ -3,9 +3,23 @@
 {
     using (Html.BeginForm("LogOff", "Account", new { area = string.Empty }, FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
-        @Html.AntiForgeryToken()
-
         <ul class="nav navbar-nav navbar-right">
+            @Html.AntiForgeryToken()
+
+            @if (User.IsInRole(CommonConstants.AdminRole))
+            {
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="admin" aria-expanded="false">Admin<span class="caret"></span></a>
+                    <ul class="dropdown-menu " aria-labelledby="admin">
+                        <li class="dropdown-item">
+                            @Html.ActionLink("Users", "Users", "Users", new { area = "Admin" }, new { @class = "dropdown-link" })
+                        </li>
+                        <li class="dropdown-item">
+                            @Html.ActionLink("Logs", "Logs", "Users", new { area = "Admin" }, new { @class = "dropdown-link" })
+                        </li>
+                    </ul>
+                </li>
+            }
             <li>
                 @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: new { area = string.Empty }, htmlAttributes: new { title = "Manage" })
             </li>

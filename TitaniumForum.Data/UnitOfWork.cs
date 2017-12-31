@@ -16,6 +16,7 @@
         private IRepository<User> users;
         private IRepository<Role> roles;
         private IRepository<UserRole> userRoles;
+        private IRepository<Log> logs;
 
         private readonly TitaniumForumDbContext context;
 
@@ -67,6 +68,11 @@
         public IRepository<UserRole> UserRoles
         {
             get { return this.userRoles ?? (this.userRoles = new Repository<UserRole>(this.context)); }
+        }
+
+        public IRepository<Log> Logs
+        {
+            get { return this.logs ?? (this.logs = new Repository<Log>(this.context)); }
         }
 
         public void Save()

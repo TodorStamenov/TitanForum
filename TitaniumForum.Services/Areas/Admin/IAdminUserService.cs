@@ -1,5 +1,6 @@
 ﻿namespace TitaniumForum.Services.Areas.Admin
 {
+    using Models.Logs;
     using Models.Roles;
     using Models.Users;
     using Services.Models.Users;
@@ -13,13 +14,13 @@
 
         bool RemoveFromRole(int userId, string roleName);
 
-        // int Total(string search);
+        int Total(string search);
 
         int Total(string role, string search);
 
         UserRolesServiceModel Roles(int id);
 
-        // IEnumerable<ListLogsServiceModel> Logs(int page, int itemsPerPage, string search);
+        IEnumerable<ListLogsServiceModel> Logs(int page, int itemsPerPage, string search);
 
         IEnumerable<RoleServiceModel> AllRoles();
 
