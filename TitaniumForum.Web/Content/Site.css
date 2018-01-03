@@ -31,3 +31,8 @@ a.disabled {
     float: left;
     margin-right: 15px;
 }
+
+.edit-button {
+    float: left;
+    margin-right: 4px;
+}

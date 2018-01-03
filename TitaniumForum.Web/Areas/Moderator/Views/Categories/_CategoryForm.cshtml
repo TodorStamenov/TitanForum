@@ -1,0 +1,10 @@
+﻿@model CategoryFormServiceModel
+
+@Html.AntiForgeryToken()
+<div class="form-group">
+    @Html.LabelFor(m => m.Name)
+    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Name, string.Empty, new { @class = "text-danger" })
+</div>
+<a class="btn btn-default" href=@Url.Action("All", "Categories")>Back</a>
+<input class="btn btn-success" type="submit" value="Save Category" />

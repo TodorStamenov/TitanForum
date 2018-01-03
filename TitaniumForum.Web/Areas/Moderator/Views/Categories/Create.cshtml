@@ -1,0 +1,14 @@
+﻿@model CategoryFormServiceModel
+
+@{
+    ViewBag.Title = "Create Category";
+}
+
+<div class="row">
+    <h2>@ViewBag.Title</h2>
+
+    @using (Html.BeginForm("Create", "Categories", FormMethod.Post))
+    {
+        Html.RenderPartial("_CategoryForm", Model);
+    }
+</div>

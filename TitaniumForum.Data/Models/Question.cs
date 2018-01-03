@@ -23,18 +23,20 @@
 
         public int ViewCount { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public int SubCategoryId { get; set; }
 
-        public SubCategory SubCategory { get; set; }
+        public virtual SubCategory SubCategory { get; set; }
 
         public int AuthorId { get; set; }
 
-        public User Author { get; set; }
+        public virtual User Author { get; set; }
 
-        public List<Answer> Answers { get; set; } = new List<Answer>();
+        public virtual List<Answer> Answers { get; set; } = new List<Answer>();
 
-        public List<UserQuestionVote> Votes { get; set; } = new List<UserQuestionVote>();
+        public virtual List<UserQuestionVote> Votes { get; set; } = new List<UserQuestionVote>();
 
-        public List<TagQuestion> Tags { get; set; } = new List<TagQuestion>();
+        public virtual List<TagQuestion> Tags { get; set; } = new List<TagQuestion>();
     }
 }

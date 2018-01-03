@@ -67,6 +67,10 @@
     <Compile Include="Migrations\201712311028064_LogsTable.Designer.cs">
       <DependentUpon>201712311028064_LogsTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801031940493_IsDeletedColumn.cs" />
+    <Compile Include="Migrations\201801031940493_IsDeletedColumn.Designer.cs">
+      <DependentUpon>201801031940493_IsDeletedColumn.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelConfigurations\AnswerConfiguraiton.cs" />
     <Compile Include="ModelConfigurations\CategoryConfiguration.cs" />
@@ -116,6 +120,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712311028064_LogsTable.resx">
       <DependentUpon>201712311028064_LogsTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801031940493_IsDeletedColumn.resx">
+      <DependentUpon>201801031940493_IsDeletedColumn.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

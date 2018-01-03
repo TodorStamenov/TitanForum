@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Delete";
+}
+
+<hr />
+@using (Html.BeginForm("Delete", "Categories", FormMethod.Post))
+{
+    @Html.AntiForgeryToken();
+    @:Are you sure you want to delete this category?
+    <input class="btn btn-danger" type="submit" value="Delete Category" />
+}

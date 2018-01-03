@@ -45,7 +45,7 @@ namespace TitaniumForum.Web
         /// Creates the kernel that will manage your application.
         /// </summary>
         /// <returns>The created kernel.</returns>
-        public static IKernel CreateKernel()
+        private static IKernel CreateKernel()
         {
             var kernel = new StandardKernel();
             try

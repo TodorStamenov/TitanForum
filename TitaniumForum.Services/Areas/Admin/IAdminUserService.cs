@@ -5,10 +5,13 @@
     using Models.Users;
     using Services.Models.Users;
     using System.Collections.Generic;
+    using TitaniumForum.Data.Models;
 
     public interface IAdminUserService
     {
         string GetUsername(int id);
+
+        void Log(string username, LogType action, string tableName);
 
         bool AddToRole(int userId, string roleName);
 

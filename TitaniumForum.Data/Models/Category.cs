@@ -12,6 +12,8 @@
         [MaxLength(DataConstants.CategoryConstants.MaxNameLength)]
         public string Name { get; set; }
 
-        public List<SubCategory> SubCategories { get; set; } = new List<SubCategory>();
+        public bool IsDeleted { get; set; }
+
+        public virtual List<SubCategory> SubCategories { get; set; } = new List<SubCategory>();
     }
 }

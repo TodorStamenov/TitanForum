@@ -20,6 +20,17 @@
                     </ul>
                 </li>
             }
+            @if (User.IsInRole(CommonConstants.ModeratorRole))
+            {
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="moderator" aria-expanded="false">Moderator<span class="caret"></span></a>
+                    <ul class="dropdown-menu " aria-labelledby="moderator">
+                        <li class="dropdown-item">
+                            @Html.ActionLink("Categories", "All", "Categories", new { area = "Moderator" }, new { @class = "dropdown-link" })
+                        </li>
+                    </ul>
+                </li>
+            }
             <li>
                 @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: new { area = string.Empty }, htmlAttributes: new { title = "Manage" })
             </li>

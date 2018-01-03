@@ -1,25 +1,23 @@
 ﻿namespace TitaniumForum.Web.Infrastructure.Filters
 {
-    using Ninject;
+    using Data.Models;
     using Services.Areas.Admin;
     using System.Web.Mvc;
 
     public class LogAttribute : ActionFilterAttribute
     {
-        //private readonly LogType logType;
-        //private readonly string tableName;
+        private readonly LogType logType;
+        private readonly string tableName;
 
-        //public LogAttribute(LogType logType, string tableName)
-        //{
-        //    this.logType = logType;
-        //    this.tableName = tableName;
-        //}
+        public LogAttribute(LogType logType, string tableName)
+        {
+            this.logType = logType;
+            this.tableName = tableName;
+        }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            IKernel kernel = NinjectWebCommon.CreateKernel();
-
-            IAdminUserService logService = kernel.Get<IAdminUserService>();
+            IAdminUserService adminService = DependencyResolver.Current.GetService<IAdminUserService>();
 
             string username = context
                 .HttpContext
@@ -27,7 +25,7 @@
                 .Identity
                 .Name;
 
-            //logService.Log(username, this.logType, this.tableName);
+            adminService.Log(username, this.logType, this.tableName);
         }
     }
 }

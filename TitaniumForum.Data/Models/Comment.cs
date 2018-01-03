@@ -16,14 +16,16 @@
 
         public DateTime DateAdded { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public int AnswerId { get; set; }
 
-        public Answer Answer { get; set; }
+        public virtual Answer Answer { get; set; }
 
         public int AuthorId { get; set; }
 
-        public User Author { get; set; }
+        public virtual User Author { get; set; }
 
-        public List<UserCommentVote> Votes { get; set; } = new List<UserCommentVote>();
+        public virtual List<UserCommentVote> Votes { get; set; } = new List<UserCommentVote>();
     }
 }

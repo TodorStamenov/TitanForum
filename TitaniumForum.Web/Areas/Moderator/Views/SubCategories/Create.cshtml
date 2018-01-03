@@ -1,0 +1,13 @@
+﻿@model SubCategoryFormViewModel
+
+@{
+    ViewBag.Title = "Create Sub Category";
+}
+
+<div class="row">
+    <h2>@ViewBag.Title</h2>
+    @using (Html.BeginForm("Create", "SubCategories", FormMethod.Post))
+    {
+        Html.RenderPartial("_SubCategoryForm", Model);
+    }
+</div>

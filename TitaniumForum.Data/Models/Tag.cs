@@ -11,6 +11,6 @@
         [MaxLength(DataConstants.TagConstants.MaxNameLength)]
         public string Name { get; set; }
 
-        public List<TagQuestion> Questions { get; set; } = new List<TagQuestion>();
+        public virtual List<TagQuestion> Questions { get; set; } = new List<TagQuestion>();
     }
 }

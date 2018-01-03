@@ -1,14 +1,14 @@
 ﻿@model ListUsersViewModel
 
 @{
-    ViewData["Title"] = $"{(Model.Search != null ? string.Empty : "All")} Users";
+    ViewData["Title"] = $"{(Model.Search != null && Model.Search != string.Empty ? string.Empty : "All")} Users";
     string previouseDisabled = Model.CurrentPage == 1 ? "disabled" : string.Empty;
     string nextDisabled = Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty;
     string userRole = Model.UserRole != null ? Model.UserRole : string.Empty;
 }
 
 <div class="row">
-    <h2>@ViewData["Title"] @(Model.UserRole != null ? $"in Role {Model.UserRole}" : string.Empty)</h2>
+    <h2>@ViewData["Title"] @(Model.UserRole != null && Model.UserRole != string.Empty ? $"in Role {Model.UserRole}" : string.Empty)</h2>
 
     @using (Html.BeginForm("Users", "Users", new { area = "Admin" }, FormMethod.Post, new { @class = "form-inline" }))
     {

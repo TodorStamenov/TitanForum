@@ -17,17 +17,17 @@
         [MaxLength(DataConstants.UserConstants.MaxProfileImageSize)]
         public byte[] ProfileImage { get; set; }
 
-        public List<Question> Questions { get; set; } = new List<Question>();
+        public virtual List<Question> Questions { get; set; } = new List<Question>();
 
-        public List<Answer> Answers { get; set; } = new List<Answer>();
+        public virtual List<Answer> Answers { get; set; } = new List<Answer>();
 
-        public List<Comment> Comments { get; set; } = new List<Comment>();
+        public virtual List<Comment> Comments { get; set; } = new List<Comment>();
 
-        public List<UserQuestionVote> QuestionVotes { get; set; } = new List<UserQuestionVote>();
+        public virtual List<UserQuestionVote> QuestionVotes { get; set; } = new List<UserQuestionVote>();
 
-        public List<UserAnswerVote> AnswerVotes { get; set; } = new List<UserAnswerVote>();
+        public virtual List<UserAnswerVote> AnswerVotes { get; set; } = new List<UserAnswerVote>();
 
-        public List<UserCommentVote> CommentVotes { get; set; } = new List<UserCommentVote>();
+        public virtual List<UserCommentVote> CommentVotes { get; set; } = new List<UserCommentVote>();
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<User, int> manager)
         {

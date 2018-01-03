@@ -25,6 +25,18 @@
         </div>
     </div>
     <div class="container body-content">
+        @if (TempData.ContainsKey(WebConstants.TempDataSuccessMessage))
+        {
+            <div class="alert alert-success text-center">
+                @TempData[WebConstants.TempDataSuccessMessage]
+            </div>
+        }
+        else if (TempData.ContainsKey(WebConstants.TempDataErrorMessage))
+        {
+            <div class="alert alert-danger text-center">
+                @TempData[WebConstants.TempDataErrorMessage]
+            </div>
+        }
         @RenderBody()
         <hr />
         <footer class="pull-right">

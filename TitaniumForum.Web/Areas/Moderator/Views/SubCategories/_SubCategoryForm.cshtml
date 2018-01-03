@@ -1,0 +1,15 @@
+﻿@model SubCategoryFormViewModel
+
+@Html.AntiForgeryToken()
+<div class="form-group">
+    @Html.LabelFor(m => m.SubCategory.Name)
+    @Html.TextBoxFor(m => m.SubCategory.Name, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.SubCategory.Name)
+</div>
+<div class="form-group">
+    @Html.LabelFor(m => m.CategoryId)
+    @Html.DropDownListFor(m => m.CategoryId, Model.Categories, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Categories)
+</div>
+<a class="btn btn-default" href=@Url.Action("All", "Categories")>Back</a>
+<input class="btn btn-success" type="submit" value="Save Sub Category" />

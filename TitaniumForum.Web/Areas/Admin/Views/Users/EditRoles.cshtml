@@ -30,19 +30,23 @@
                         <td>
                             @if (Model.User.Roles.Any(r => r.Name == role.Name))
                             {
-                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="RemoveRole">
+                                using (Html.BeginForm("RemoveRole", "Users", new { area = "Admin" }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="userId" value="@Model.User.Id" />
                                     <input type="hidden" name="roleName" value="@role.Name" />
-                                    <input class="btn btn-default" type="submit" value="Remove From Role" />
-                                </form>
+                                    <input class="btn btn-default" type="submit" value="Remove Role" />
+                                }
                             }
                             else
                             {
-                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="AddRole">
+                                using (Html.BeginForm("AddRole", "Users", new { area = "Admin" }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="userId" value="@Model.User.Id" />
                                     <input type="hidden" name="roleName" value="@role.Name" />
-                                    <input class="btn btn-success" type="submit" value="Add To Role" />
-                                </form>
+                                    <input class="btn btn-success" type="submit" value="Add Role" />
+                                }
                             }
                         </td>
                     </tr>
@@ -54,17 +58,21 @@
                         <td>
                             @if (Model.IsUserLocked)
                             {
-                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="Unlock">
+                                using (Html.BeginForm("Unlock", "Users", new { area = "Admin" }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="userId" value="@Model.User.Id" />
-                                    <input class="btn btn-success" type="submit" value="Unlock" />
-                                </form>
+                                    <input class="btn btn-default" type="submit" value="Unlock" />
+                                }
                             }
                             else
                             {
-                                <form method="post" asp-area="Admin" asp-controller="Users" asp-action="Lock">
+                                using (Html.BeginForm("Lock", "Users", new { area = "Admin" }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="userId" value="@Model.User.Id" />
                                     <input class="btn btn-warning" type="submit" value="Lock" />
-                                </form>
+                                }
                             }
                         </td>
                     </tr>

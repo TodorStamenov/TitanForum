@@ -4,13 +4,14 @@
     using Data.Models;
     using Infrastructure;
     using Infrastructure.Extensions;
+    using Infrastructure.Filters;
     using Infrastructure.Helpers;
+    using Models.Logs;
     using Models.Users;
     using Services.Areas.Admin;
     using System;
     using System.Threading.Tasks;
     using System.Web.Mvc;
-    using TitaniumForum.Web.Areas.Admin.Models.Logs;
     using Web.Controllers;
 
     [RouteArea(WebConstants.AdminArea)]
@@ -19,6 +20,7 @@
     {
         private const int UsersPerPage = 10;
         private const int LogsPerPage = 10;
+        private const string UsersTable = "Users";
 
         private readonly IAdminUserService userService;
         private readonly ApplicationUserManager userManager;
@@ -49,6 +51,7 @@
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult AddRole(int userId, string roleName)
         {
             string username = this.userService.GetUsername(userId);
@@ -71,6 +74,7 @@
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult RemoveRole(int userId, string roleName)
         {
             string username = this.userService.GetUsername(userId);
@@ -93,6 +97,8 @@
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Log(LogType.Lock, UsersTable)]
         public async Task<ActionResult> Lock(int userId)
         {
             User user = await this.userManager.FindByIdAsync(userId);
@@ -116,6 +122,8 @@
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Log(LogType.Unlock, UsersTable)]
         public async Task<ActionResult> Unlock(int userId)
         {
             User user = await this.userManager.FindByIdAsync(userId);
