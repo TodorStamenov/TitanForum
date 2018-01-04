@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ListQuestionsServiceModel>
+
+@foreach (var question in Model)
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1 class="panel-title">
+                <a href="@Url.Action("Details","Questions",new { area = string.Empty, id = question.Id })">@question.Title</a>
+            </h1>
+        </div>
+        <div class="panel-body">
+            <div class="site-image">
+                <img src="@question.AuthorProfileImage" alt="Author Image" width="25" height="25" />
+            </div>
+            @question.AuthorUsername
+            <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
+            @question.DateAdded.ToShortDateString()
+            <span class="glyphicon glyphicon-folder-open site-glyphicon"></span>
+            @question.SubCategoryName
+            <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon"></span>
+            @question.UpVotes
+            <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon"></span>
+            @question.DownVotes
+            <span class="glyphicon glyphicon-eye-open site-glyphicon"></span>
+            @question.ViewCount
+            <span class="glyphicon glyphicon-share-alt site-glyphicon"></span>
+            @question.AnswersCount
+        </div>
+    </div>
+}

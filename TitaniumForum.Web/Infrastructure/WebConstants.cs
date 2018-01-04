@@ -20,5 +20,7 @@
         public const string UserRemovedFormRole = "User {0} successfully removed from role {1}";
         public const string UserLocked = "User {0} successfully Locked";
         public const string UserUnlocked = "User {0} successfully Unlocked";
+
+        public const string DataImage = "data:image/jpeg;base64,";
     }
 }

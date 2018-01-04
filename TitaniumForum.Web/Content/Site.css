@@ -36,3 +36,7 @@ a.disabled {
     float: left;
     margin-right: 4px;
 }
+
+.site-glyphicon {
+    margin-left: 15px;
+}

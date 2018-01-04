@@ -4,6 +4,8 @@
     using Data;
     using Data.Models;
     using Models.Categories;
+    using Services.Models.Categories;
+    using Services.Models.SubCategories;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -130,6 +132,27 @@
                 .Where(c => c.Id == id)
                 .ProjectTo<CategoryFormServiceModel>()
                 .FirstOrDefault();
+        }
+
+        public IEnumerable<MenuCategoryServiceModel> GetMenu()
+        {
+            return this.db
+                .Categories
+                .AllEntries()
+                .Where(c => !c.IsDeleted)
+                .Select(c => new MenuCategoryServiceModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    SubCategories = c.SubCategories
+                        .Where(sc => !sc.IsDeleted)
+                        .Select(sc => new MenuSubCategoryServiceModel
+                        {
+                            Id = sc.Id,
+                            Name = sc.Name
+                        })
+                })
+                .ToList();
         }
 
         public IEnumerable<ListCategoriesServiceModel> All()

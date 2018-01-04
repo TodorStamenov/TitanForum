@@ -16,10 +16,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Titanium Forum", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Titanium Forum", "All", "Questions", new { area = string.Empty }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav"></ul>
+                <ul class="nav navbar-nav">
+                    <li><a href="@Url.Action("Ranking", "Users", new { area = string.Empty })">Ranking</a></li>
+                </ul>
                 @Html.Partial("_LoginPartial")
             </div>
         </div>

@@ -1,38 +1,50 @@
 ﻿namespace TitaniumForum.Web.Controllers
 {
+    using Data;
+    using Data.Models;
+    using Infrastructure;
+    using Infrastructure.Extensions;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.Owin;
     using Microsoft.Owin.Security;
     using Models.Manage;
+    using System;
     using System.Threading.Tasks;
     using System.Web;
     using System.Web.Mvc;
+    using TitaniumForum.Services;
 
     [Authorize]
-    public class ManageController : Controller
+    public class ManageController : BaseController
     {
-        private ApplicationSignInManager _signInManager;
-        private ApplicationUserManager _userManager;
+        private ApplicationSignInManager signInManager;
+        private ApplicationUserManager userManager;
+        private readonly IUserService userService;
 
         public ManageController()
         {
         }
 
-        public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public ManageController(
+            ApplicationUserManager userManager,
+            ApplicationSignInManager signInManager,
+            IUserService userService)
         {
-            UserManager = userManager;
-            SignInManager = signInManager;
+            this.UserManager = userManager;
+            this.SignInManager = signInManager;
+            this.userService = userService;
         }
 
         public ApplicationSignInManager SignInManager
         {
             get
             {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+                return this.signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
+
             private set
             {
-                _signInManager = value;
+                this.signInManager = value;
             }
         }
 
@@ -40,11 +52,12 @@
         {
             get
             {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                return this.userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
             }
+
             private set
             {
-                _userManager = value;
+                this.userManager = value;
             }
         }
 
@@ -57,40 +70,50 @@
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
 
-            var userId = User.Identity.GetUserId<int>();
-            var model = new IndexViewModel
+            User user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
+
+            IndexViewModel model = new IndexViewModel
             {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId.ToString())
+                ProfileImage = this.ConvertUserImage(user.ProfileImage)
             };
+
             return View(model);
         }
 
         //
-        // POST: /Manage/RemoveLogin
+        // GET: /Manage/Index
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> RemoveLogin(string loginProvider, string providerKey)
+        public ActionResult Index(IndexViewModel model)
         {
-            ManageMessageId? message;
-            var result = await UserManager.RemoveLoginAsync(User.Identity.GetUserId<int>(), new UserLoginInfo(loginProvider, providerKey));
-            if (result.Succeeded)
+            int userId = User.Identity.GetUserId<int>();
+
+            bool success = true;
+
+            if (model.Image != null)
             {
-                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
-                if (user != null)
+                if (!model.Image.ContentType.Contains("image")
+                        || model.Image.ContentLength > DataConstants.UserConstants.MaxProfileImageSize)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    TempData.AddErrorMessage("Uploaded image file must be less then 100 KB");
+                    return RedirectToAction(nameof(Index));
                 }
-                message = ManageMessageId.RemoveLoginSuccess;
+
+                success = this.userService.AddProfileImage(userId, model.Image.ToByteArray());
+
+                if (!success)
+                {
+                    return BadRequest();
+                }
             }
-            else
+
+            if (!success)
             {
-                message = ManageMessageId.Error;
+                return BadRequest();
             }
-            return RedirectToAction("ManageLogins", new { Message = message });
+
+            TempData.AddSuccessMessage("Your profile has been updated");
+            return RedirectToAction(nameof(Index));
         }
 
         //
@@ -126,10 +149,10 @@
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && _userManager != null)
+            if (disposing && userManager != null)
             {
-                _userManager.Dispose();
-                _userManager = null;
+                userManager.Dispose();
+                userManager = null;
             }
 
             base.Dispose(disposing);
@@ -148,6 +171,11 @@
             }
         }
 
+        private string ConvertUserImage(byte[] profileImage)
+        {
+            return WebConstants.DataImage + Convert.ToBase64String(profileImage);
+        }
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -156,34 +184,9 @@
             }
         }
 
-        private bool HasPassword()
-        {
-            var user = UserManager.FindById(User.Identity.GetUserId<int>());
-            if (user != null)
-            {
-                return user.PasswordHash != null;
-            }
-            return false;
-        }
-
-        private bool HasPhoneNumber()
-        {
-            var user = UserManager.FindById(User.Identity.GetUserId<int>());
-            if (user != null)
-            {
-                return user.PhoneNumber != null;
-            }
-            return false;
-        }
-
         public enum ManageMessageId
         {
-            AddPhoneSuccess,
             ChangePasswordSuccess,
-            SetTwoFactorSuccess,
-            SetPasswordSuccess,
-            RemoveLoginSuccess,
-            RemovePhoneSuccess,
             Error
         }
 

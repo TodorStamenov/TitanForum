@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using TitaniumForum.Services.Areas.Moderator.Models.Categories;
-
-namespace TitaniumForum.Services.Areas.Moderator
+﻿namespace TitaniumForum.Services.Areas.Moderator
 {
+    using Models.Categories;
+    using Services.Models.Categories;
+    using System.Collections.Generic;
+
     public interface ICategoryService
     {
         bool NameExists(string name);
@@ -18,6 +19,8 @@ namespace TitaniumForum.Services.Areas.Moderator
         bool Restore(int id);
 
         CategoryFormServiceModel GetForm(int id);
+
+        IEnumerable<MenuCategoryServiceModel> GetMenu();
 
         IEnumerable<ListCategoriesServiceModel> All();
     }

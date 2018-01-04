@@ -227,13 +227,15 @@
     <Compile Include="Areas\Moderator\Controllers\SubCategoriesController.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\SubCategoryFormViewModel.cs" />
     <Compile Include="Areas\Moderator\ModeratorAreaRegistration.cs" />
+    <Compile Include="Controllers\MenuController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\Extensions\FormFileExtensions.cs" />
     <Compile Include="Infrastructure\Extensions\KernelExtensions.cs" />
     <Compile Include="Infrastructure\Extensions\TempDataDictionaryExtensions.cs" />
     <Compile Include="Infrastructure\Filters\LogAttribute.cs" />
@@ -245,6 +247,7 @@
     <Compile Include="Models\Account\RegisterViewModel.cs" />
     <Compile Include="Models\Manage\ChangePasswordViewModel.cs" />
     <Compile Include="Models\Manage\IndexViewModel.cs" />
+    <Compile Include="Models\Questions\ListQuestionsViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -314,13 +317,17 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Shared\_CategoryMenu.cshtml" />
+    <Content Include="Views\Questions\All.cshtml" />
+    <Content Include="Views\Questions\ByCategory.cshtml" />
+    <Content Include="Views\Questions\BySubCategory.cshtml" />
+    <Content Include="Views\Questions\_ListQuestions.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

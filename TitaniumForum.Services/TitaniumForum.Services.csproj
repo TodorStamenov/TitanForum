@@ -70,9 +70,17 @@
     <Compile Include="Areas\Moderator\Models\Categories\ListCategoriesServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\ListSubCategoriesServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\SubCategoryFormServiceModel.cs" />
+    <Compile Include="Implementations\QuestionService.cs" />
+    <Compile Include="Implementations\UserService.cs" />
     <Compile Include="Infrastructure\Extensions\LogExtensions.cs" />
+    <Compile Include="Infrastructure\Extensions\QuestionExtensions.cs" />
     <Compile Include="Infrastructure\Extensions\UserExtensions.cs" />
+    <Compile Include="IQuestionService.cs" />
     <Compile Include="IService.cs" />
+    <Compile Include="IUserService.cs" />
+    <Compile Include="Models\Categories\MenuCategoryServiceModel.cs" />
+    <Compile Include="Models\Questions\ListQuestionsServiceModel.cs" />
+    <Compile Include="Models\SubCategories\MenuSubCategoryServiceModel.cs" />
     <Compile Include="Models\Users\ListUsersServiceModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\ServiceConstants.cs" />
@@ -87,9 +95,7 @@
       <Name>TitaniumForum.Data</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Implementations\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />

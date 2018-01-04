@@ -39,7 +39,7 @@
 
         public static class UserConstants
         {
-            public const int MaxProfileImageSize = 1024 * 1024;
+            public const int MaxProfileImageSize = 100 * 1024;
         }
     }
 }

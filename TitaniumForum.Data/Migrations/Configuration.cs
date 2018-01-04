@@ -1,16 +1,17 @@
 namespace TitaniumForum.Data.Migrations
 {
     using Common;
-    using Data.Models;
+    using IdentityModels;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
+    using Models;
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
-    using TitaniumForum.Data.IdentityModels;
 
     internal sealed class Configuration : DbMigrationsConfiguration<TitaniumForumDbContext>
     {
@@ -58,6 +59,8 @@ namespace TitaniumForum.Data.Migrations
                 RequireLowercase = false,
                 RequireUppercase = false
             };
+
+            Assembly assembly = CommonConstants.loadWebAssembly;
 
             Task.Run(async () =>
             {
@@ -254,11 +257,6 @@ namespace TitaniumForum.Data.Migrations
                         UserId = userId,
                         Direction = direction
                     });
-
-                    int likesCount = question.Votes.Count(v => v.Direction == Direction.Like);
-                    int dislikesCount = question.Votes.Count(v => v.Direction == Direction.Dislike);
-
-                    question.Rating = likesCount - dislikesCount;
                 }
 
                 context.Questions.Add(question);
@@ -316,11 +314,6 @@ namespace TitaniumForum.Data.Migrations
                         UserId = userId,
                         Direction = direction
                     });
-
-                    int likesCount = answer.Votes.Count(v => v.Direction == Direction.Like);
-                    int dislikesCount = answer.Votes.Count(v => v.Direction == Direction.Dislike);
-
-                    answer.Rating = likesCount - dislikesCount;
                 }
 
                 context.Answers.Add(answer);
@@ -378,11 +371,6 @@ namespace TitaniumForum.Data.Migrations
                         UserId = userId,
                         Direction = direction
                     });
-
-                    int likesCount = comment.Votes.Count(v => v.Direction == Direction.Like);
-                    int dislikesCount = comment.Votes.Count(v => v.Direction == Direction.Dislike);
-
-                    comment.Rating = likesCount - dislikesCount;
                 }
 
                 context.Comments.Add(comment);

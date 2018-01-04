@@ -71,6 +71,10 @@
     <Compile Include="Migrations\201801031940493_IsDeletedColumn.Designer.cs">
       <DependentUpon>201801031940493_IsDeletedColumn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801041634012_RemovedRatingColumn.cs" />
+    <Compile Include="Migrations\201801041634012_RemovedRatingColumn.Designer.cs">
+      <DependentUpon>201801041634012_RemovedRatingColumn.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelConfigurations\AnswerConfiguraiton.cs" />
     <Compile Include="ModelConfigurations\CategoryConfiguration.cs" />
@@ -123,6 +127,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801031940493_IsDeletedColumn.resx">
       <DependentUpon>201801031940493_IsDeletedColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801041634012_RemovedRatingColumn.resx">
+      <DependentUpon>201801041634012_RemovedRatingColumn.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
