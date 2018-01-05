@@ -9,14 +9,13 @@
             </h1>
         </div>
         <div class="panel-body">
-            <div class="site-image">
-                <img src="@question.AuthorProfileImage" alt="Author Image" width="25" height="25" />
-            </div>
+            <img class="site-image" src="@question.AuthorProfileImage" alt="Author Image" width="25" height="25" />
             @question.AuthorUsername
             <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
             @question.DateAdded.ToShortDateString()
             <span class="glyphicon glyphicon-folder-open site-glyphicon"></span>
-            @question.SubCategoryName
+            <a href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = question.SubCategoryId })">@question.SubCategoryName</a>
+            <hr />
             <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon"></span>
             @question.UpVotes
             <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon"></span>
@@ -25,6 +24,19 @@
             @question.ViewCount
             <span class="glyphicon glyphicon-share-alt site-glyphicon"></span>
             @question.AnswersCount
+            <hr />
+            Last Activity:
+            @if (question.AnswersCount > 0)
+            {
+                <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
+                @question.LastAnswerDate
+                <img class="last-user-image" src="@question.LastUserProfileImage" alt="Last User Image" width="25" height="25" />
+                @question.LastUserUsername
+            }
+            else
+            {
+                <span>No answers for this question</span>
+            }
         </div>
     </div>
 }

@@ -12,8 +12,8 @@
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Questions", action = "All", id = UrlParameter.Optional }
-            );
+                defaults: new { controller = "Questions", action = "All", id = UrlParameter.Optional },
+                namespaces: new[] { "TitaniumForum.Web.Controllers" });
         }
     }
 }

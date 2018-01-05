@@ -4,6 +4,10 @@
 
     public interface ISubCategoryService
     {
+        bool IsDeleted(int id);
+
+        bool Exists(int id);
+
         bool NameExists(string name);
 
         string GetName(int id);

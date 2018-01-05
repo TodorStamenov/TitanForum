@@ -18,7 +18,7 @@
         {
             <ul class="pagination">
                 <li class="page-item">
-                    <a class="page-link @previouseDisabled" href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, page = Model.PrevPage, categoryId = Model.CategoryId})" aria-label="Previous">
+                    <a class="page-link @previouseDisabled" href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, page = Model.PrevPage, id = Model.CategoryId})" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                         <span class="sr-only">Previous</span>
                     </a>
@@ -26,11 +26,11 @@
                 @for (int i = Model.FirstPage; i <= Model.LastPage; i++)
                 {
                     <li class="page-item @(Model.CurrentPage == i ? "active" : string.Empty)">
-                        <a class="page-link @(Model.CurrentPage == i ? "disabled" : string.Empty)" href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, page = i, categoryId = Model.CategoryId})">@i</a>
+                        <a class="page-link @(Model.CurrentPage == i ? "disabled" : string.Empty)" href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, page = i, id = Model.CategoryId})">@i</a>
                     </li>
                 }
                 <li class="page-item">
-                    <a class="page-link @nextDisabled" href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, page = Model.NextPage, categoryId = Model.CategoryId})" aria-label="Next">
+                    <a class="page-link @nextDisabled" href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, page = Model.NextPage, id = Model.CategoryId})" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>

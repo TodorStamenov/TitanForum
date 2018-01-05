@@ -1,11 +1,8 @@
 ﻿namespace TitaniumForum.Services.Implementations
 {
     using Data;
-    using Data.Models;
-    using Infrastructure;
     using Infrastructure.Extensions;
     using Models.Questions;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -23,6 +20,7 @@
             return this.db
                 .Questions
                 .AllEntries()
+                .Where(q => !q.IsDeleted)
                 .Filter(search)
                 .Count();
         }
@@ -31,14 +29,18 @@
         {
             return this.db
                 .Questions
-                .Count(q => q.SubCategory.CategoryId == id);
+                .Where(q => q.SubCategory.CategoryId == id)
+                .Where(q => !q.IsDeleted)
+                .Count();
         }
 
         public int TotalBySubCategory(int id)
         {
             return this.db
                 .Questions
-                .Count(q => q.SubCategoryId == id);
+                .Where(q => q.SubCategoryId == id)
+                .Where(q => !q.IsDeleted)
+                .Count();
         }
 
         public IEnumerable<ListQuestionsServiceModel> ByCategory(int page, int pageSize, int categoryId)
@@ -47,25 +49,11 @@
                  .Questions
                  .AllEntries()
                  .Where(q => !q.IsDeleted)
-                 .Where(q => !q.SubCategory.IsDeleted)
                  .Where(q => q.SubCategory.CategoryId == categoryId)
                  .OrderByDescending(q => q.DateAdded)
                  .Skip((page - 1) * pageSize)
                  .Take(pageSize)
-                 .AsEnumerable()
-                 .Select(q => new ListQuestionsServiceModel
-                 {
-                     Id = q.Id,
-                     Title = q.Title,
-                     DateAdded = q.DateAdded.ToLocalTime(),
-                     AnswersCount = q.Answers.Count,
-                     SubCategoryName = q.SubCategory.Name,
-                     AuthorUsername = q.Author.UserName,
-                     AuthorProfileImage = ServiceConstants.DataImage + Convert.ToBase64String(q.Author.ProfileImage),
-                     ViewCount = q.ViewCount,
-                     UpVotes = q.Votes.Count(v => v.Direction == Direction.Like),
-                     DownVotes = q.Votes.Count(v => v.Direction == Direction.Dislike)
-                 })
+                 .ProjectToListModel()
                  .ToList();
         }
 
@@ -75,25 +63,11 @@
                 .Questions
                 .AllEntries()
                 .Where(q => !q.IsDeleted)
-                .Where(q => !q.SubCategory.IsDeleted)
                 .Where(q => q.SubCategoryId == subCategoryId)
                 .OrderByDescending(q => q.DateAdded)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .AsEnumerable()
-                .Select(q => new ListQuestionsServiceModel
-                {
-                    Id = q.Id,
-                    Title = q.Title,
-                    DateAdded = q.DateAdded.ToLocalTime(),
-                    AnswersCount = q.Answers.Count,
-                    SubCategoryName = q.SubCategory.Name,
-                    AuthorUsername = q.Author.UserName,
-                    AuthorProfileImage = ServiceConstants.DataImage + Convert.ToBase64String(q.Author.ProfileImage),
-                    ViewCount = q.ViewCount,
-                    UpVotes = q.Votes.Count(v => v.Direction == Direction.Like),
-                    DownVotes = q.Votes.Count(v => v.Direction == Direction.Dislike)
-                })
+                .ProjectToListModel()
                 .ToList();
         }
 
@@ -107,20 +81,7 @@
                 .OrderByDescending(q => q.DateAdded)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .AsEnumerable()
-                .Select(q => new ListQuestionsServiceModel
-                {
-                    Id = q.Id,
-                    Title = q.Title,
-                    DateAdded = q.DateAdded.ToLocalTime(),
-                    AnswersCount = q.Answers.Count,
-                    SubCategoryName = q.SubCategory.Name,
-                    AuthorUsername = q.Author.UserName,
-                    AuthorProfileImage = ServiceConstants.DataImage + Convert.ToBase64String(q.Author.ProfileImage),
-                    ViewCount = q.ViewCount,
-                    UpVotes = q.Votes.Count(v => v.Direction == Direction.Like),
-                    DownVotes = q.Votes.Count(v => v.Direction == Direction.Dislike)
-                })
+                .ProjectToListModel()
                 .ToList();
         }
     }

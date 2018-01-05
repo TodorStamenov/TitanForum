@@ -1,0 +1,55 @@
+﻿@model ListUserRankingViewModel
+
+@{
+    ViewBag.Title = "User Ranking";
+    int counter = (Model.CurrentPage - 1) * 6;
+    string previouseDisabled = Model.CurrentPage == 1 ? "disabled" : string.Empty;
+    string nextDisabled = Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty;
+}
+
+<div class="row">
+    <br />
+    @foreach (var user in Model.Users)
+    {
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">
+                        @user.Username
+                    </h1>
+                </div>
+                <div class="panel-body">
+                    <img class="site-image" src="@user.ProfileImage" alt="User Image" width="100" height="100" />
+                    <h4>#@(++counter)</h4>
+                    <h4>Rating: @user.Rating</h4>
+                    <h4>Posts: @user.PostsCount</h4>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@if (Model.Users.Any())
+{
+    <div class="row">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link @previouseDisabled" href="@Url.Action("Ranking", "Users", new { area = string.Empty, page = Model.PrevPage})" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            @for (int i = Model.FirstPage; i <= Model.LastPage; i++)
+            {
+                <li class="page-item @(Model.CurrentPage == i ? "active" : string.Empty)">
+                    <a class="page-link @(Model.CurrentPage == i ? "disabled" : string.Empty)" href="@Url.Action("Ranking", "Users", new { area = string.Empty, page = i })">@i</a>
+                </li>
+            }
+            <li class="page-item">
+                <a class="page-link @nextDisabled" href="@Url.Action("Ranking", "Users", new { area = string.Empty, page = Model.NextPage})" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+}

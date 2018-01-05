@@ -18,6 +18,22 @@
             this.db = db;
         }
 
+        public bool IsDeleted(int id)
+        {
+            return this.db
+                .Categories
+                .Where(c => c.Id == id)
+                .Select(c => c.IsDeleted)
+                .FirstOrDefault();
+        }
+
+        public bool Exists(int id)
+        {
+            return this.db
+                .Categories
+                .Any(sc => sc.Id == id);
+        }
+
         public bool NameExists(string name)
         {
             return this.db
@@ -140,6 +156,7 @@
                 .Categories
                 .AllEntries()
                 .Where(c => !c.IsDeleted)
+                .Where(c => c.SubCategories.Any(sc => sc.Questions.Any(q => !q.IsDeleted)))
                 .Select(c => new MenuCategoryServiceModel
                 {
                     Id = c.Id,

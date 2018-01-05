@@ -12,7 +12,6 @@
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
-    using TitaniumForum.Services.Infrastructure;
 
     public class AdminUserService : IAdminUserService
     {
@@ -133,7 +132,7 @@
                     Id = u.Id,
                     Username = u.UserName,
                     Email = u.Email,
-                    ProfileImage = ServiceConstants.DataImage + Convert.ToBase64String(u.ProfileImage),
+                    ProfileImage = u.ProfileImage.ConvertImage(),
                     Roles = u.Roles
                         .Select(r => new RoleServiceModel
                         {
@@ -173,10 +172,10 @@
                 .AllEntries()
                 .Filter(search)
                 .InRole(role)
-                .ProjectTo<ListUsersServiceModel>()
-                .OrderBy(u => u.Username)
+                .OrderBy(u => u.UserName)
                 .Skip((page - 1) * usersPerPage)
                 .Take(usersPerPage)
+                .ProjectTo<ListUsersServiceModel>()
                 .ToList();
         }
     }

@@ -8,6 +8,8 @@
 
         public string Title { get; set; }
 
+        public int SubCategoryId { get; set; }
+
         public string SubCategoryName { get; set; }
 
         public string AuthorUsername { get; set; }
@@ -22,6 +24,12 @@
 
         public int DownVotes { get; set; }
 
+        public string LastUserUsername { get; set; }
+
+        public string LastUserProfileImage { get; set; }
+
         public DateTime DateAdded { get; set; }
+
+        public DateTime? LastAnswerDate { get; set; }
     }
 }

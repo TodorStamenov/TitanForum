@@ -15,6 +15,22 @@
             this.db = db;
         }
 
+        public bool IsDeleted(int id)
+        {
+            return this.db
+                .SubCategories
+                .Where(c => c.Id == id)
+                .Select(c => c.IsDeleted)
+                .FirstOrDefault();
+        }
+
+        public bool Exists(int id)
+        {
+            return this.db
+                 .SubCategories
+                 .Any(sc => sc.Id == id);
+        }
+
         public bool NameExists(string name)
         {
             return this.db

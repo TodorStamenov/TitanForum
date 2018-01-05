@@ -19,8 +19,8 @@ namespace TitaniumForum.Data.Migrations
         private const int ModeratorsCount = 3;
         private const int UsersCount = 50;
         private const int CategoriesCount = 3;
-        private const int SubCategoriesCount = CategoriesCount * 5;
-        private const int QuestionsCount = SubCategoriesCount * 5;
+        private const int SubCategoriesCount = CategoriesCount * 3;
+        private const int QuestionsCount = SubCategoriesCount * 20;
         private const int AnswersCount = QuestionsCount * 5;
         private const int CommentsCount = QuestionsCount;
         private const int TagsCount = 50;
@@ -60,7 +60,7 @@ namespace TitaniumForum.Data.Migrations
                 RequireUppercase = false
             };
 
-            Assembly assembly = CommonConstants.loadWebAssembly;
+            Assembly assembly = CommonConstants.webAssembly;
 
             Task.Run(async () =>
             {
@@ -205,7 +205,7 @@ namespace TitaniumForum.Data.Migrations
             }
 
             List<int> subCategoryIds = await context.SubCategories.Select(c => c.Id).ToListAsync();
-            List<int> userIds = await context.Users.Select(u => u.Id).ToListAsync();
+            List<User> users = await context.Users.ToListAsync();
             List<int> tagIds = await context.Tags.Select(u => u.Id).ToListAsync();
 
             for (int i = 1; i <= questionsCount; i++)
@@ -216,7 +216,7 @@ namespace TitaniumForum.Data.Migrations
                     Content = CommonConstants.lorem,
                     DateAdded = DateTime.UtcNow.AddDays(-i).AddHours(-i).AddMinutes(-i),
                     ViewCount = random.Next(MinViewsPerQuestion, MaxViewsPerQuestion),
-                    AuthorId = userIds[random.Next(0, userIds.Count)],
+                    AuthorId = users[random.Next(0, users.Count)].Id,
                     SubCategoryId = subCategoryIds[random.Next(0, subCategoryIds.Count)]
                 };
 
@@ -242,9 +242,9 @@ namespace TitaniumForum.Data.Migrations
 
                 for (int j = 0; j < votesPerQuestion; j++)
                 {
-                    int userId = userIds[random.Next(0, userIds.Count)];
+                    User user = users[random.Next(0, users.Count)];
 
-                    if (question.Votes.Any(v => v.UserId == userId))
+                    if (question.Votes.Any(v => v.UserId == user.Id))
                     {
                         j--;
                         continue;
@@ -254,9 +254,18 @@ namespace TitaniumForum.Data.Migrations
 
                     question.Votes.Add(new UserQuestionVote
                     {
-                        UserId = userId,
+                        UserId = user.Id,
                         Direction = direction
                     });
+
+                    if (direction == Direction.Like)
+                    {
+                        user.Rating++;
+                    }
+                    else if (direction == Direction.Dislike)
+                    {
+                        user.Rating--;
+                    }
                 }
 
                 context.Questions.Add(question);
@@ -272,7 +281,7 @@ namespace TitaniumForum.Data.Migrations
                 return;
             }
 
-            List<int> userIds = await context.Users.Select(u => u.Id).ToListAsync();
+            List<User> users = await context.Users.ToListAsync();
             var questionInfo = await context
                 .Questions
 
@@ -290,7 +299,7 @@ namespace TitaniumForum.Data.Migrations
                 Answer answer = new Answer
                 {
                     Content = CommonConstants.lorem.Substring(0, CommonConstants.lorem.Length / 2),
-                    AuthorId = userIds[random.Next(0, userIds.Count)],
+                    AuthorId = users[random.Next(0, users.Count)].Id,
                     DateAdded = question.DateAdded.AddHours(i).AddMinutes(i),
                     QuestionId = question.Id
                 };
@@ -299,9 +308,9 @@ namespace TitaniumForum.Data.Migrations
 
                 for (int j = 0; j < votesPerAnswer; j++)
                 {
-                    int userId = userIds[random.Next(0, userIds.Count)];
+                    User user = users[random.Next(0, users.Count)];
 
-                    if (answer.Votes.Any(v => v.UserId == userId))
+                    if (answer.Votes.Any(v => v.UserId == user.Id))
                     {
                         j--;
                         continue;
@@ -311,9 +320,18 @@ namespace TitaniumForum.Data.Migrations
 
                     answer.Votes.Add(new UserAnswerVote
                     {
-                        UserId = userId,
+                        UserId = user.Id,
                         Direction = direction
                     });
+
+                    if (direction == Direction.Like)
+                    {
+                        user.Rating++;
+                    }
+                    else if (direction == Direction.Dislike)
+                    {
+                        user.Rating--;
+                    }
                 }
 
                 context.Answers.Add(answer);
@@ -329,7 +347,7 @@ namespace TitaniumForum.Data.Migrations
                 return;
             }
 
-            List<int> userIds = await context.Users.Select(u => u.Id).ToListAsync();
+            List<User> users = await context.Users.ToListAsync();
             var answerInfo = await context
                 .Answers
 
@@ -347,7 +365,7 @@ namespace TitaniumForum.Data.Migrations
                 Comment comment = new Comment
                 {
                     Content = CommonConstants.lorem.Substring(0, CommonConstants.lorem.Length / 4),
-                    AuthorId = userIds[random.Next(0, userIds.Count)],
+                    AuthorId = users[random.Next(0, users.Count)].Id,
                     DateAdded = answer.DateAdded.AddHours(i).AddMinutes(i),
                     AnswerId = answer.Id
                 };
@@ -356,9 +374,9 @@ namespace TitaniumForum.Data.Migrations
 
                 for (int j = 0; j < votesPerComment; j++)
                 {
-                    int userId = userIds[random.Next(0, userIds.Count)];
+                    User user = users[random.Next(0, users.Count)];
 
-                    if (comment.Votes.Any(v => v.UserId == userId))
+                    if (comment.Votes.Any(v => v.UserId == user.Id))
                     {
                         j--;
                         continue;
@@ -368,9 +386,18 @@ namespace TitaniumForum.Data.Migrations
 
                     comment.Votes.Add(new UserCommentVote
                     {
-                        UserId = userId,
+                        UserId = user.Id,
                         Direction = direction
                     });
+
+                    if (direction == Direction.Like)
+                    {
+                        user.Rating++;
+                    }
+                    else if (direction == Direction.Dislike)
+                    {
+                        user.Rating--;
+                    }
                 }
 
                 context.Comments.Add(comment);

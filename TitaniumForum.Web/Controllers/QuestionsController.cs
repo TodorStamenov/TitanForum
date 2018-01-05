@@ -3,22 +3,32 @@
     using Infrastructure.Helpers;
     using Models.Questions;
     using Services;
+    using Services.Areas.Moderator;
     using System.Web.Mvc;
 
     public class QuestionsController : BaseController
     {
-        private const int QuestionsPerPage = 10;
+        private const int QuestionsPerPage = 5;
 
         private readonly IQuestionService questionService;
+        private readonly ICategoryService categoryService;
+        private readonly ISubCategoryService subCategoryService;
 
-        public QuestionsController(IQuestionService questionService)
+        public QuestionsController(
+            IQuestionService questionService,
+            ICategoryService categoryService,
+            ISubCategoryService subCategoryService)
         {
             this.questionService = questionService;
+            this.categoryService = categoryService;
+            this.subCategoryService = subCategoryService;
         }
 
         public ActionResult ByCategory(int? id, int? page)
         {
-            if (id == null)
+            if (id == null
+                || !this.categoryService.Exists((int)id)
+                || this.categoryService.IsDeleted((int)id))
             {
                 return RedirectToAction(nameof(All));
             }
@@ -45,7 +55,9 @@
 
         public ActionResult BySubCategory(int? id, int? page)
         {
-            if (id == null)
+            if (id == null
+                || !this.subCategoryService.Exists((int)id)
+                || this.subCategoryService.IsDeleted((int)id))
             {
                 return RedirectToAction(nameof(All));
             }

@@ -40,3 +40,12 @@ a.disabled {
 .site-glyphicon {
     margin-left: 15px;
 }
+
+.last-user-image {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.search-form {
+    margin-top: 7px;
+}
