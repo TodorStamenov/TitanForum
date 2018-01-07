@@ -1,0 +1,15 @@
+﻿@model QuestionRedirectServiceModel
+
+@{
+    ViewBag.Title = "Delete Answer";
+}
+
+<hr />
+@using (Html.BeginForm("Delete", "Answers", FormMethod.Post))
+{
+    @Html.AntiForgeryToken();
+    @Html.HiddenFor(m => m.Page)
+    @Html.HiddenFor(m => m.QuestionId)
+    @:Are you sure you want to delete this answer?
+    <input class="btn btn-danger" type="submit" value="Delete Answer" />
+}

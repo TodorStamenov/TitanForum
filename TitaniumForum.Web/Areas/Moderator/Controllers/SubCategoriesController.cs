@@ -62,9 +62,15 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, SubCategory, WebConstants.Added));
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                SubCategory,
+                WebConstants.Added));
 
-            return RedirectToAction(nameof(CategoriesController.All), Categories, new { area = WebConstants.ModeratorArea });
+            return RedirectToAction(
+                nameof(CategoriesController.All),
+                Categories,
+                new { area = WebConstants.ModeratorArea });
         }
 
         public ActionResult Edit(int id)
@@ -118,9 +124,15 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, SubCategory, WebConstants.Edited));
+            TempData.AddSuccessMessage(
+                string.Format(WebConstants.SuccessfullEntityOperation,
+                SubCategory,
+                WebConstants.Edited));
 
-            return RedirectToAction(nameof(CategoriesController.All), Categories, new { area = WebConstants.ModeratorArea });
+            return RedirectToAction(
+                nameof(CategoriesController.All),
+                Categories,
+                new { area = WebConstants.ModeratorArea });
         }
 
         public ActionResult Delete(int id)
@@ -141,9 +153,15 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, SubCategory, WebConstants.Deleted));
+            TempData.AddSuccessMessage(
+                string.Format(WebConstants.SuccessfullEntityOperation,
+                SubCategory,
+                WebConstants.Deleted));
 
-            return RedirectToAction(nameof(CategoriesController.All), Categories, new { area = WebConstants.ModeratorArea });
+            return RedirectToAction(
+                nameof(CategoriesController.All),
+                Categories,
+                new { area = WebConstants.ModeratorArea });
         }
 
         [HttpPost]
@@ -158,9 +176,15 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, SubCategory, WebConstants.Restored));
+            TempData.AddSuccessMessage(
+                string.Format(WebConstants.SuccessfullEntityOperation,
+                SubCategory,
+                WebConstants.Restored));
 
-            return RedirectToAction(nameof(CategoriesController.All), Categories, new { area = WebConstants.ModeratorArea });
+            return RedirectToAction(
+                nameof(CategoriesController.All),
+                Categories,
+                new { area = WebConstants.ModeratorArea });
         }
 
         private IEnumerable<SelectListItem> GetCategories()

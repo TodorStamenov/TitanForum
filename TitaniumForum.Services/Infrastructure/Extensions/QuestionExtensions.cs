@@ -30,7 +30,7 @@
                     Id = q.Id,
                     Title = q.Title,
                     DateAdded = q.DateAdded.ToLocalTime(),
-                    AnswersCount = q.Answers.Count,
+                    AnswersCount = q.Answers.Count(a => !a.IsDeleted),
                     SubCategoryId = q.SubCategoryId,
                     SubCategoryName = q.SubCategory.Name,
                     AuthorUsername = q.Author.UserName,
@@ -46,13 +46,14 @@
 
         private static Answer GetLastAnswer(Question question)
         {
-            if (!question.Answers.Any())
+            if (!question.Answers.Where(a => !a.IsDeleted).Any())
             {
                 return null;
             }
 
             return question
                 .Answers
+                .Where(a => !a.IsDeleted)
                 .OrderBy(a => a.DateAdded)
                 .Last();
         }

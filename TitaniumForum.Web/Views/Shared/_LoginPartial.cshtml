@@ -28,6 +28,15 @@
                         <li class="dropdown-item">
                             @Html.ActionLink("Categories", "All", "Categories", new { area = "Moderator" }, new { @class = "dropdown-link" })
                         </li>
+                        <li class="dropdown-item">
+                            @Html.ActionLink("Reported", "Reported", "Questions", new { area = "Moderator" }, new { @class = "dropdown-link" })
+                        </li>
+                        <li class="dropdown-item">
+                            @Html.ActionLink("Locked", "Locked", "Questions", new { area = "Moderator" }, new { @class = "dropdown-link" })
+                        </li>
+                        <li class="dropdown-item">
+                            @Html.ActionLink("Deleted", "Deleted", "Questions", new { area = "Moderator" }, new { @class = "dropdown-link" })
+                        </li>
                     </ul>
                 </li>
             }

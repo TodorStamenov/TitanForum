@@ -1,0 +1,11 @@
+﻿@model AnswerFormServiceModel
+
+@Html.AntiForgeryToken()
+<div class="form-group">
+    @Html.HiddenFor(m => m.RedirectInfo.Page)
+    @Html.HiddenFor(m => m.RedirectInfo.QuestionId)
+    @Html.LabelFor(m => m.Content)
+    @Html.TextAreaFor(m => m.Content, new { @class = "form-control", rows = 15 })
+    @Html.ValidationMessageFor(m => m.Content, string.Empty, new { @class = "text-danger" })
+</div>
+<input class="btn btn-success" type="submit" value="Save Answer" />

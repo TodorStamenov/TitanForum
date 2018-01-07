@@ -3,7 +3,10 @@
     using AutoMapper.QueryableExtensions;
     using Data;
     using Data.Models;
+    using Models.Categories;
     using Models.SubCategories;
+    using Services.Models.Categories;
+    using System.Collections.Generic;
     using System.Linq;
 
     public class SubCategoryService : ISubCategoryService
@@ -49,14 +52,7 @@
 
         public bool Create(int categoryId, string name)
         {
-            var categoryInfo = this.db
-                .Categories
-                .Where(c => c.Id == categoryId)
-                .Select(c => new
-                {
-                    c.IsDeleted
-                })
-                .FirstOrDefault();
+            CategoryInfoServiceModel categoryInfo = this.GetCategoryInfo(categoryId);
 
             if (this.NameExists(name)
                 || categoryInfo == null
@@ -81,14 +77,7 @@
         {
             SubCategory subCategory = this.db.SubCategories.Find(id);
 
-            var categoryInfo = this.db
-                .Categories
-                .Where(c => c.Id == categoryId)
-                .Select(c => new
-                {
-                    c.IsDeleted
-                })
-                .FirstOrDefault();
+            CategoryInfoServiceModel categoryInfo = this.GetCategoryInfo(categoryId);
 
             if (subCategory == null
                 || categoryInfo == null
@@ -164,6 +153,27 @@
                 .AllEntries()
                 .Where(sc => sc.Id == id)
                 .ProjectTo<SubCategoryFormServiceModel>()
+                .FirstOrDefault();
+        }
+
+        public IEnumerable<MenuCategoryServiceModel> GetMenu()
+        {
+            return this.db
+                .SubCategories
+                .AllEntries()
+                .Where(sc => !sc.IsDeleted)
+                .OrderBy(sc => sc.Name)
+                .ProjectTo<MenuCategoryServiceModel>()
+                .ToList();
+        }
+
+        private CategoryInfoServiceModel GetCategoryInfo(int categoryId)
+        {
+            return this.db
+                .Categories
+                .AllEntries()
+                .Where(c => c.Id == categoryId)
+                .ProjectTo<CategoryInfoServiceModel>()
                 .FirstOrDefault();
         }
     }

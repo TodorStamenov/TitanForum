@@ -2,13 +2,12 @@
 
 @foreach (var question in Model)
 {
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h1 class="panel-title">
-                <a href="@Url.Action("Details","Questions",new { area = string.Empty, id = question.Id })">@question.Title</a>
-            </h1>
-        </div>
-        <div class="panel-body">
+    <div class="well">
+        <h3>
+            <a href="@Url.Action("Details","Questions",new { area = string.Empty, id = question.Id })">@question.Title</a>
+        </h3>
+        <hr />
+        <div>
             <img class="site-image" src="@question.AuthorProfileImage" alt="Author Image" width="25" height="25" />
             @question.AuthorUsername
             <span class="glyphicon glyphicon-calendar site-glyphicon"></span>

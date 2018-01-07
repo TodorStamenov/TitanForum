@@ -49,3 +49,22 @@ a.disabled {
 .search-form {
     margin-top: 7px;
 }
+
+.site-panel {
+    padding: 20px;
+}
+
+input, select, textarea {
+    max-width: 100%;
+}
+
+.glyphicon-submit {
+    margin-left: 15px;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.glyphicon-button {
+    font-size: 20px;
+}

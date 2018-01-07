@@ -1,0 +1,15 @@
+﻿@model AnswerFormServiceModel
+
+@{
+    ViewBag.Title = "Edit Answer";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-6">
+        <h2>@ViewBag.Title</h2>
+        @using (Html.BeginForm("Edit", "Answers", FormMethod.Post))
+        {
+            @Html.Partial("_AnswerForm", Model)
+        }
+    </div>
+</div>

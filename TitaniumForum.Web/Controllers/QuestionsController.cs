@@ -1,27 +1,256 @@
 ﻿namespace TitaniumForum.Web.Controllers
 {
+    using Common;
+    using Data.Models;
+    using Infrastructure;
+    using Infrastructure.Extensions;
+    using Infrastructure.Filters;
     using Infrastructure.Helpers;
+    using Microsoft.AspNet.Identity;
     using Models.Questions;
     using Services;
     using Services.Areas.Moderator;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Web.Mvc;
 
     public class QuestionsController : BaseController
     {
+        private const int AnswersPerPage = 5;
         private const int QuestionsPerPage = 5;
+        private const string Question = "Question";
+        private const string Questions = "Questions";
 
-        private readonly IQuestionService questionService;
+        private readonly IAnswerService answerService;
         private readonly ICategoryService categoryService;
+        private readonly IQuestionService questionService;
         private readonly ISubCategoryService subCategoryService;
+        private readonly ITagService tagService;
 
         public QuestionsController(
-            IQuestionService questionService,
+            IAnswerService answerService,
             ICategoryService categoryService,
-            ISubCategoryService subCategoryService)
+            IQuestionService questionService,
+            ISubCategoryService subCategoryService,
+            ITagService tagService)
         {
-            this.questionService = questionService;
+            this.answerService = answerService;
             this.categoryService = categoryService;
+            this.questionService = questionService;
             this.subCategoryService = subCategoryService;
+            this.tagService = tagService;
+        }
+
+        [Authorize]
+        public ActionResult Create()
+        {
+            QuestionFormViewModel model = new QuestionFormViewModel
+            {
+                SubCategories = this.GetSubCategories()
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(QuestionFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.SubCategories = this.GetSubCategories();
+                return View(model);
+            }
+
+            string title = model.Question.Title;
+
+            if (this.questionService.TitleExists(title))
+            {
+                model.SubCategories = this.GetSubCategories();
+                TempData.AddErrorMessage(string.Format(WebConstants.EntryExists, Question));
+                return View(model);
+            }
+
+            int authorId = User.Identity.GetUserId<int>();
+
+            int id = this.questionService.Create(
+                authorId,
+                title,
+                model.Question.Content,
+                model.Question.Tags,
+                model.SubCategoryId);
+
+            if (id < 1)
+            {
+                return BadRequest();
+            }
+
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                Question,
+                WebConstants.Added));
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [Authorize]
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            int userId = User.Identity.GetUserId<int>();
+
+            bool canEdit = this.questionService.CanEdit((int)id, userId);
+
+            if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
+            {
+                return new HttpUnauthorizedResult();
+            }
+
+            QuestionFormViewModel model = new QuestionFormViewModel
+            {
+                Question = this.questionService.GetForm((int)id),
+                SubCategories = this.GetSubCategories()
+            };
+
+            if (model.Question == null)
+            {
+                return BadRequest();
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int? id, QuestionFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.SubCategories = this.GetSubCategories();
+                return View(model);
+            }
+
+            int userId = User.Identity.GetUserId<int>();
+
+            bool canEdit = this.questionService.CanEdit((int)id, userId);
+
+            if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
+            {
+                return new HttpUnauthorizedResult();
+            }
+
+            string oldTitle = this.questionService.GetTitle((int)id);
+
+            if (oldTitle == null)
+            {
+                return BadRequest();
+            }
+
+            string newTitle = model.Question.Title;
+
+            if (this.questionService.TitleExists(newTitle)
+                && newTitle != oldTitle)
+            {
+                model.SubCategories = this.GetSubCategories();
+                TempData.AddErrorMessage(string.Format(WebConstants.EntryExists, Question));
+                return View(model);
+            }
+
+            bool success = this.questionService.Edit(
+                (int)id,
+                newTitle,
+                model.Question.Content,
+                model.Question.Tags,
+                model.SubCategoryId);
+
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                Question,
+                WebConstants.Edited));
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [Authorize(Roles = CommonConstants.ModeratorRole)]
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            return View();
+        }
+
+        [Authorize(Roles = CommonConstants.ModeratorRole)]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Log(LogType.Delete, Questions)]
+        [ActionName(nameof(Delete))]
+        public ActionResult DeletePost(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            bool success = this.questionService.Delete((int)id);
+
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                Question,
+                WebConstants.Deleted));
+
+            return RedirectToAction(nameof(All));
+        }
+
+        public ActionResult Details(int? id, int? page)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            int totalAnswers = this.answerService.TotalByQuestion((int)id);
+
+            int userId = User.Identity.GetUserId<int>();
+
+            QuestionDetailsViewModel model = new QuestionDetailsViewModel
+            {
+                CurrentPage = (int)page,
+                TotalPages = ControllerHelpers.GetTotalPages(totalAnswers, AnswersPerPage),
+                Question = this.questionService.Details((int)id, userId),
+                Answers = this.answerService.ByQuestion((int)id, userId, (int)page, AnswersPerPage),
+                Tags = this.tagService.ByQuestion((int)id)
+            };
+
+            if (model.Question == null)
+            {
+                return BadRequest();
+            }
+
+            return View(model);
         }
 
         public ActionResult ByCategory(int? id, int? page)
@@ -47,6 +276,7 @@
                 Search = null,
                 CategoryId = id,
                 SubCategoryId = null,
+                TagId = null,
                 Questions = this.questionService.ByCategory((int)page, QuestionsPerPage, (int)id)
             };
 
@@ -76,7 +306,37 @@
                 Search = null,
                 CategoryId = null,
                 SubCategoryId = id,
+                TagId = null,
                 Questions = this.questionService.BySubCategory((int)page, QuestionsPerPage, (int)id)
+            };
+
+            return View(model);
+        }
+
+        public ActionResult ByTag(int? id, int? page)
+        {
+            if (id == null
+               || !this.tagService.Exists((int)id))
+            {
+                return RedirectToAction(nameof(All));
+            }
+
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            int totalQuestions = this.questionService.TotalByTag((int)id);
+
+            ListQuestionsViewModel model = new ListQuestionsViewModel
+            {
+                CurrentPage = (int)page,
+                TotalPages = ControllerHelpers.GetTotalPages(totalQuestions, QuestionsPerPage),
+                Search = null,
+                CategoryId = null,
+                SubCategoryId = null,
+                TagId = (int)id,
+                Questions = this.questionService.ByTag((int)page, QuestionsPerPage, (int)id)
             };
 
             return View(model);
@@ -98,10 +358,22 @@
                 Search = search,
                 CategoryId = null,
                 SubCategoryId = null,
+                TagId = null,
                 Questions = this.questionService.All((int)page, QuestionsPerPage, search)
             };
 
             return View(model);
+        }
+
+        private IEnumerable<SelectListItem> GetSubCategories()
+        {
+            return this.subCategoryService
+                .GetMenu()
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                });
         }
     }
 }

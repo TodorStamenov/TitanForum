@@ -8,11 +8,11 @@
     using Microsoft.AspNet.Identity.Owin;
     using Microsoft.Owin.Security;
     using Models.Manage;
+    using Services;
     using System;
     using System.Threading.Tasks;
     using System.Web;
     using System.Web.Mvc;
-    using TitaniumForum.Services;
 
     [Authorize]
     public class ManageController : BaseController

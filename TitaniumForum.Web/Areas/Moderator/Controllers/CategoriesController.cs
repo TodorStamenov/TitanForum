@@ -51,7 +51,10 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, Category, WebConstants.Added));
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                Category,
+                WebConstants.Added));
 
             return RedirectToAction(nameof(All));
         }
@@ -101,7 +104,10 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, Category, WebConstants.Edited));
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                Category,
+                WebConstants.Edited));
 
             return RedirectToAction(nameof(All));
         }
@@ -124,7 +130,10 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, Category, WebConstants.Deleted));
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                Category,
+                WebConstants.Deleted));
 
             return RedirectToAction(nameof(All));
         }
@@ -141,7 +150,10 @@
                 return BadRequest();
             }
 
-            TempData.AddSuccessMessage(string.Format(WebConstants.SuccessfullEntityOperation, Category, WebConstants.Restored));
+            TempData.AddSuccessMessage(string.Format(
+                WebConstants.SuccessfullEntityOperation,
+                Category,
+                WebConstants.Restored));
 
             return RedirectToAction(nameof(All));
         }

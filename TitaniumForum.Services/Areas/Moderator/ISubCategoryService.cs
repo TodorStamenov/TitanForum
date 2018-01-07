@@ -1,6 +1,8 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator
 {
     using Models.SubCategories;
+    using Services.Models.Categories;
+    using System.Collections.Generic;
 
     public interface ISubCategoryService
     {
@@ -21,5 +23,7 @@
         bool Restore(int id);
 
         SubCategoryFormServiceModel GetForm(int id);
+
+        IEnumerable<MenuCategoryServiceModel> GetMenu();
     }
 }

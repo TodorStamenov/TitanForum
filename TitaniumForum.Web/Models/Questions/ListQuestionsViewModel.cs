@@ -12,6 +12,8 @@
 
         public int? SubCategoryId { get; set; }
 
+        public int? TagId { get; set; }
+
         public IEnumerable<ListQuestionsServiceModel> Questions { get; set; }
     }
 }

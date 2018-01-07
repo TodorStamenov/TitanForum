@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Delete Question";
+}
+
+<hr />
+@using (Html.BeginForm("Delete", "Questions", FormMethod.Post))
+{
+    @Html.AntiForgeryToken();
+    @:Are you sure you want to delete this question?
+    <input class="btn btn-danger" type="submit" value="Delete Question" />
+}
