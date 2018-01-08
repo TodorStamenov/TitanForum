@@ -10,10 +10,12 @@
     using Models.Questions;
     using Services;
     using Services.Areas.Moderator;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Mvc;
 
+    [Authorize]
     public class QuestionsController : BaseController
     {
         private const int AnswersPerPage = 5;
@@ -41,7 +43,6 @@
             this.tagService = tagService;
         }
 
-        [Authorize]
         public ActionResult Create()
         {
             QuestionFormViewModel model = new QuestionFormViewModel
@@ -52,7 +53,6 @@
             return View(model);
         }
 
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(QuestionFormViewModel model)
@@ -94,7 +94,6 @@
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -126,7 +125,6 @@
         }
 
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int? id, QuestionFormViewModel model)
         {
@@ -217,9 +215,43 @@
                 Question,
                 WebConstants.Deleted));
 
-            return RedirectToAction(nameof(All));
+            return RedirectToAction(nameof(All), new { area = string.Empty });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Vote(int? id, int? page, string direction)
+        {
+            if (id == null || direction == null)
+            {
+                return BadRequest();
+            }
+
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            bool parsed = Enum.TryParse(direction, true, out Direction voteDirection);
+
+            if (!parsed)
+            {
+                return BadRequest();
+            }
+
+            int userId = User.Identity.GetUserId<int>();
+
+            bool success = this.questionService.Vote((int)id, userId, voteDirection);
+
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            return RedirectToAction(nameof(Details), new { id, page });
+        }
+
+        [AllowAnonymous]
         public ActionResult Details(int? id, int? page)
         {
             if (id == null)
@@ -253,11 +285,13 @@
             return View(model);
         }
 
+        [AllowAnonymous]
         public ActionResult ByCategory(int? id, int? page)
         {
             if (id == null
                 || !this.categoryService.Exists((int)id)
-                || this.categoryService.IsDeleted((int)id))
+                || this.categoryService.IsDeleted((int)id)
+                || !this.categoryService.HasQuestions((int)id))
             {
                 return RedirectToAction(nameof(All));
             }
@@ -283,11 +317,13 @@
             return View(model);
         }
 
+        [AllowAnonymous]
         public ActionResult BySubCategory(int? id, int? page)
         {
             if (id == null
                 || !this.subCategoryService.Exists((int)id)
-                || this.subCategoryService.IsDeleted((int)id))
+                || this.subCategoryService.IsDeleted((int)id)
+                || !this.subCategoryService.HasQuestions((int)id))
             {
                 return RedirectToAction(nameof(All));
             }
@@ -313,6 +349,7 @@
             return View(model);
         }
 
+        [AllowAnonymous]
         public ActionResult ByTag(int? id, int? page)
         {
             if (id == null
@@ -342,6 +379,7 @@
             return View(model);
         }
 
+        [AllowAnonymous]
         public ActionResult All(int? page, string search)
         {
             if (page == null || page < 1)

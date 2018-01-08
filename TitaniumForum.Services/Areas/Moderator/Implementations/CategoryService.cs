@@ -18,6 +18,13 @@
             this.db = db;
         }
 
+        public bool Exists(int id)
+        {
+            return this.db
+                .Categories
+                .Any(sc => sc.Id == id);
+        }
+
         public bool IsDeleted(int id)
         {
             return this.db
@@ -27,11 +34,14 @@
                 .FirstOrDefault();
         }
 
-        public bool Exists(int id)
+        public bool HasQuestions(int id)
         {
             return this.db
                 .Categories
-                .Any(sc => sc.Id == id);
+                .Where(c => c.Id == id)
+                .SelectMany(c => c.SubCategories.SelectMany(sc => sc.Questions))
+                .Where(q => !q.IsDeleted)
+                .Any();
         }
 
         public bool NameExists(string name)

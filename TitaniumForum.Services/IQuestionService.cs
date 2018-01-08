@@ -1,5 +1,6 @@
 ﻿namespace TitaniumForum.Services
 {
+    using Data.Models;
     using Models.Questions;
     using System.Collections.Generic;
 
@@ -32,6 +33,10 @@
         bool Unlock(int id);
 
         bool Report(int id);
+
+        bool Conceal(int id);
+
+        bool Vote(int id, int userId, Direction voteDirection);
 
         QuestionFormServiceModel GetForm(int id);
 

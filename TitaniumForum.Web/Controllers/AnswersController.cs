@@ -9,6 +9,7 @@
     using Services;
     using Services.Models.Answers;
     using Services.Models.Questions;
+    using System;
     using System.Web.Mvc;
 
     [Authorize]
@@ -222,6 +223,44 @@
                 nameof(QuestionsController.Details),
                 Questions,
                 new { id = model.QuestionId, model.Page });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Vote(int? id, int? answerId, int? page, string direction)
+        {
+            if (id == null
+                || answerId == null
+                || direction == null)
+            {
+                return BadRequest();
+            }
+
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            bool parsed = Enum.TryParse(direction, true, out Direction voteDirection);
+
+            if (!parsed)
+            {
+                return BadRequest();
+            }
+
+            int userId = User.Identity.GetUserId<int>();
+
+            bool success = this.answerService.Vote((int)answerId, userId, voteDirection);
+
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            return RedirectToAction(
+                nameof(QuestionsController.Details),
+                Questions,
+                new { id, page });
         }
     }
 }

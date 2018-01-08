@@ -86,6 +86,39 @@
             return true;
         }
 
+        public bool Vote(int id, int userId, Direction voteDirection)
+        {
+            Comment comment = this.db.Comments.Find(id);
+
+            if (comment == null
+                || comment.IsDeleted
+                || comment.Votes.Any(v => v.UserId == userId))
+            {
+                return false;
+            }
+
+            User user = comment.Author;
+
+            comment.Votes.Add(new UserCommentVote
+            {
+                UserId = userId,
+                Direction = voteDirection
+            });
+
+            if (voteDirection == Direction.Like)
+            {
+                user.Rating++;
+            }
+            else if (voteDirection == Direction.Dislike)
+            {
+                user.Rating--;
+            }
+
+            this.db.Save();
+
+            return true;
+        }
+
         public CommentFormServiceModel GetForm(int id)
         {
             return this.db

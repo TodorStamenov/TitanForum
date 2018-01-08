@@ -38,36 +38,81 @@
             }
             <hr />
             <h3>
-                <a href="@Url.Action("Details", "Questions", new { area = string.Empty, id = Model.Question.Id })">@Model.Question.Title</a>
+                <a href="@Url.Action("Details", "Questions", new { area = string.Empty, id = Model.Question.Id })">
+                    @Model.Question.Title
+                </a>
             </h3>
             <p>@Model.Question.Content</p>
             <hr />
             Tags:
             @foreach (var tag in Model.Tags)
             {
-                <a class="btn btn-default" href="@Url.Action("ByTag", "Questions", new { area = string.Empty, id = tag.Id })">@tag.Name</a>
+                <a class="btn btn-default" href="@Url.Action("ByTag", "Questions", new { area = string.Empty, id = tag.Id })">
+                    @tag.Name
+                </a>
             }
             <hr />
-            <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon"></span>
-            @Model.Question.UpVotes
-            <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon"></span>
-            @Model.Question.DownVotes
+            @if (!User.Identity.IsAuthenticated || Model.Question.HasVoted)
+            {
+                <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
+                @Model.Question.UpVotes
+                <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
+                @Model.Question.DownVotes
+            }
+            else
+            {
+                using (Html.BeginForm("Vote", "Questions", FormMethod.Post, new { @class = "pull-left" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                    @Html.Hidden("page", Model.CurrentPage)
+                    @Html.Hidden(nameof(Direction), Direction.Like)
+                    <button class="glyphicon-vote-submit" type="submit">
+                        <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon glyphicon-vote-button"></span>
+                    </button>
+                    @Model.Question.UpVotes
+                }
+                using (Html.BeginForm("Vote", "Questions", FormMethod.Post, new { @class = "pull-left" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                    @Html.Hidden("page", Model.CurrentPage)
+                    @Html.Hidden(nameof(Direction), Direction.Dislike)
+                    <button class="glyphicon-vote-submit" type="submit">
+                        <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon glyphicon-vote-button"></span>
+                    </button>
+                    @Model.Question.DownVotes
+                }
+            }
             <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
             @Model.Question.DateAdded
             <span class="glyphicon glyphicon-folder-open site-glyphicon"></span>
-            <a href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = Model.Question.SubCategoryId })">@Model.Question.SubCategoryName</a>
+            <a href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = Model.Question.SubCategoryId })">
+                @Model.Question.SubCategoryName
+            </a>
             @if (User.Identity.IsAuthenticated)
             {
                 <hr />
-                <a class="btn btn-success" href="@Url.Action("Create", "Answers", new { questionId = Model.Question.Id, page = Model.CurrentPage })">Answer</a>
+                <a class="btn btn-success" href="@Url.Action("Create", "Answers", new { questionId = Model.Question.Id, page = Model.CurrentPage })">
+                    Answer
+                </a>
                 <div class="pull-right">
                     @if (Model.Question.IsOwner || User.IsInRole(CommonConstants.ModeratorRole))
                     {
-                        <a class="btn btn-warning" href="@Url.Action("Edit", "Questions", new { id = Model.Question.Id })">Edit</a>
+                        <a class="btn btn-default" href="@Url.Action("Edit", "Questions", new { id = Model.Question.Id })">
+                            Edit
+                        </a>
                     }
                     @if (User.IsInRole(CommonConstants.ModeratorRole))
                     {
-                        <a class="btn btn-danger" href="@Url.Action("Delete", "Questions", new { id = Model.Question.Id })">Delete</a>
+                        using (Html.BeginForm("Lock", "Questions", FormMethod.Post, new { @class = "pull-left" }))
+                        {
+                            @Html.HiddenFor(m => m.Question.Id)
+                            <input class="btn btn-default" type="submit" value="Lock" />
+                        }
+                        <a class="btn btn-default" href="@Url.Action("Delete", "Questions", new { id = Model.Question.Id })">
+                            Delete
+                        </a>
                     }
                 </div>
             }
@@ -118,24 +163,60 @@
                 <hr />
                 <p>@answer.Content</p>
                 <hr />
-                <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon"></span>
-                @answer.UpVotes
-                <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon"></span>
-                @answer.DownVotes
+                @if (!User.Identity.IsAuthenticated || answer.HasVoted)
+                {
+                    <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
+                    @answer.UpVotes
+                    <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
+                    @answer.DownVotes
+                }
+                else
+                {
+                    using (Html.BeginForm("Vote", "Answers", FormMethod.Post, new { @class = "pull-left" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                        @Html.Hidden("answerId", answer.Id)
+                        @Html.Hidden("page", Model.CurrentPage)
+                        @Html.Hidden(nameof(Direction), Direction.Like)
+                        <button class="glyphicon-vote-submit" type="submit">
+                            <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon glyphicon-vote-button"></span>
+                        </button>
+                        @answer.UpVotes
+                    }
+                    using (Html.BeginForm("Vote", "Answers", FormMethod.Post, new { @class = "pull-left" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                        @Html.Hidden("answerId", answer.Id)
+                        @Html.Hidden("page", Model.CurrentPage)
+                        @Html.Hidden(nameof(Direction), Direction.Dislike)
+                        <button class="glyphicon-vote-submit" type="submit">
+                            <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon glyphicon-vote-button"></span>
+                        </button>
+                        @answer.DownVotes
+                    }
+                }
                 <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
                 @answer.DateAdded
                 @if (User.Identity.IsAuthenticated)
                 {
                     <hr />
-                    <a class="btn btn-success" href="@Url.Action("Create", "Comments", new { answerId = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage  })">Comment</a>
+                    <a class="btn btn-success" href="@Url.Action("Create", "Comments", new { answerId = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage  })">
+                        Comment
+                    </a>
                     <div class="pull-right">
                         @if (answer.IsOwner || User.IsInRole(CommonConstants.ModeratorRole))
                         {
-                            <a class="btn btn-warning" href="@Url.Action("Edit", "Answers", new { id = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">Edit</a>
+                            <a class="btn btn-default" href="@Url.Action("Edit", "Answers", new { id = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                                Edit
+                            </a>
                         }
                         @if (User.IsInRole(CommonConstants.ModeratorRole))
                         {
-                            <a class="btn btn-danger" href="@Url.Action("Delete", "Answers", new { id = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">Delete</a>
+                            <a class="btn btn-default" href="@Url.Action("Delete", "Answers", new { id = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                                Delete
+                            </a>
                         }
                     </div>
                 }
@@ -162,10 +243,40 @@
                     <hr />
                     <p>@comment.Content</p>
                     <hr />
-                    <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon"></span>
-                    @comment.UpVotes
-                    <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon"></span>
-                    @comment.DownVotes
+                    @if (!User.Identity.IsAuthenticated || comment.HasVoted)
+                    {
+                        <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
+                        @comment.UpVotes
+                        <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
+                        @comment.DownVotes
+                    }
+                    else
+                    {
+                        using (Html.BeginForm("Vote", "Comments", FormMethod.Post, new { @class = "pull-left" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                            @Html.Hidden("commentId", comment.Id)
+                            @Html.Hidden("page", Model.CurrentPage)
+                            @Html.Hidden(nameof(Direction), Direction.Like)
+                            <button class="glyphicon-vote-submit" type="submit">
+                                <span class="glyphicon glyphicon-thumbs-up text-success site-glyphicon glyphicon-vote-button"></span>
+                            </button>
+                            @comment.UpVotes
+                        }
+                        using (Html.BeginForm("Vote", "Comments", FormMethod.Post, new { @class = "pull-left" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                            @Html.Hidden("commentId", comment.Id)
+                            @Html.Hidden("page", Model.CurrentPage)
+                            @Html.Hidden(nameof(Direction), Direction.Dislike)
+                            <button class="glyphicon-vote-submit" type="submit">
+                                <span class="glyphicon glyphicon-thumbs-down text-danger site-glyphicon glyphicon-vote-button"></span>
+                            </button>
+                            @comment.DownVotes
+                        }
+                    }
                     <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
                     @comment.DateAdded
                     @if (User.Identity.IsAuthenticated)
@@ -173,11 +284,15 @@
                         if (comment.IsOwner || User.IsInRole(CommonConstants.ModeratorRole))
                         {
                             <hr />
-                            <a class="btn btn-warning" href="@Url.Action("Edit", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">Edit</a>
+                            <a class="btn btn-default" href="@Url.Action("Edit", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                                Edit
+                            </a>
                         }
                         if (User.IsInRole(CommonConstants.ModeratorRole))
                         {
-                            <a class="btn btn-danger" href="@Url.Action("Delete", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">Delete</a>
+                            <a class="btn btn-default" href="@Url.Action("Delete", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                                Delete
+                            </a>
                         }
                     }
                 </div>

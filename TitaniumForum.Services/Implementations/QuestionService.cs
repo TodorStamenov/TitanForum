@@ -187,7 +187,22 @@
 
         public bool Restore(int id)
         {
-            throw new NotImplementedException();
+            Question question = this.db.Questions.Find(id);
+            SubCategoryInfoServiceModel subCategoryInfo = this.GetSubCategoryInfo(question.SubCategoryId);
+
+            if (question == null
+                || !question.IsDeleted
+                || subCategoryInfo == null
+                || subCategoryInfo.IsDeleted)
+            {
+                return false;
+            }
+
+            question.IsDeleted = true;
+
+            this.db.Save();
+
+            return true;
         }
 
         public bool Lock(int id)
@@ -203,6 +218,44 @@
         public bool Report(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public bool Conceal(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Vote(int id, int userId, Direction voteDirection)
+        {
+            Question question = this.db.Questions.Find(id);
+
+            if (question == null
+                || question.IsDeleted
+                || question.Votes.Any(v => v.UserId == userId))
+            {
+                return false;
+            }
+
+            User user = question.Author;
+
+            question.Votes.Add(new UserQuestionVote
+            {
+                UserId = userId,
+                Direction = voteDirection
+            });
+
+            if (voteDirection == Direction.Like)
+            {
+                user.Rating++;
+            }
+            else if (voteDirection == Direction.Dislike)
+            {
+                user.Rating--;
+            }
+
+            this.db.Save();
+
+            return true;
         }
 
         public QuestionFormServiceModel GetForm(int id)
@@ -318,7 +371,7 @@
         private SubCategoryInfoServiceModel GetSubCategoryInfo(int subCategoryId)
         {
             return this.db
-                .Categories
+                .SubCategories
                 .AllEntries()
                 .Where(c => c.Id == subCategoryId)
                 .ProjectTo<SubCategoryInfoServiceModel>()

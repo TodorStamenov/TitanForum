@@ -7,15 +7,14 @@
 <div class="row">
     <h2>
         @ViewBag.Title -
-        <a class="btn btn-primary" href="@Url.Action("Create", "Categories")">New Category</a>
-        <a class="btn btn-primary" href="@Url.Action("Create", "SubCategories")">New Sub Category</a>
+        <a class="btn btn-success" href="@Url.Action("Create", "Categories")">New Category</a>
+        <a class="btn btn-success" href="@Url.Action("Create", "SubCategories")">New Sub Category</a>
     </h2>
     <table class="table table-hover table-striped">
         <thead>
             <tr>
                 <th>Category Name</th>
                 <th>Sub Category Name</th>
-                <th class="text-center">Is Existing</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -25,18 +24,8 @@
                 <tr>
                     <td>@category.Name</td>
                     <td></td>
-                    <td class="text-center">
-                        @if (category.IsDeleted)
-                        {
-                            <span class="glyphicon glyphicon-remove text-danger"></span>
-                        }
-                        else
-                        {
-                            <span class="glyphicon glyphicon-ok text-success"></span>
-                        }
-                    </td>
                     <td>
-                        <a class="btn btn-warning btn-xs edit-button" href="@Url.Action("Edit", "Categories", new { id = category.Id })">Edit</a>
+                        <a class="btn btn-default btn-xs edit-button" href="@Url.Action("Edit", "Categories", new { id = category.Id })">Edit</a>
                         @if (category.IsDeleted)
                         {
                             using (Html.BeginForm("Restore", "Categories", FormMethod.Post))
@@ -48,7 +37,7 @@
                         }
                         else
                         {
-                            <a class="btn btn-danger btn-xs" href="@Url.Action("Delete", "Categories", new { id = category.Id })">Delete</a>
+                            <a class="btn btn-default btn-xs" href="@Url.Action("Delete", "Categories", new { id = category.Id })">Delete</a>
                         }
                     </td>
                 </tr>
@@ -58,18 +47,8 @@
                     <tr>
                         <td>-></td>
                         <td>@subCategory.Name</td>
-                        <td class="text-center">
-                            @if (subCategory.IsDeleted)
-                            {
-                                <span class="glyphicon glyphicon-remove text-danger"></span>
-                            }
-                            else
-                            {
-                                <span class="glyphicon glyphicon-ok text-success"></span>
-                            }
-                        </td>
                         <td>
-                            <a class="btn btn-warning btn-xs edit-button" href="@Url.Action("Edit", "SubCategories", new { id = subCategory.Id })">Edit</a>
+                            <a class="btn btn-default btn-xs edit-button" href="@Url.Action("Edit", "SubCategories", new { id = subCategory.Id })">Edit</a>
                             @if (!category.IsDeleted)
                             {
                                 if (subCategory.IsDeleted)
@@ -83,7 +62,7 @@
                                 }
                                 else
                                 {
-                                    <a class="btn btn-danger btn-xs" href="@Url.Action("Delete", "SubCategories", new { id = subCategory.Id })">Delete</a>
+                                    <a class="btn btn-default btn-xs" href="@Url.Action("Delete", "SubCategories", new { id = subCategory.Id })">Delete</a>
                                 }
                             }
                         </td>

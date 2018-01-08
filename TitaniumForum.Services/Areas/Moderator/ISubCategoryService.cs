@@ -6,9 +6,11 @@
 
     public interface ISubCategoryService
     {
+        bool Exists(int id);
+
         bool IsDeleted(int id);
 
-        bool Exists(int id);
+        bool HasQuestions(int id);
 
         bool NameExists(string name);
 

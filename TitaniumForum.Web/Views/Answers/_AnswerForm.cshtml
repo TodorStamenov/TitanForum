@@ -4,8 +4,14 @@
 <div class="form-group">
     @Html.HiddenFor(m => m.RedirectInfo.Page)
     @Html.HiddenFor(m => m.RedirectInfo.QuestionId)
-    @Html.LabelFor(m => m.Content)
-    @Html.TextAreaFor(m => m.Content, new { @class = "form-control", rows = 15 })
-    @Html.ValidationMessageFor(m => m.Content, string.Empty, new { @class = "text-danger" })
+    @Html.LabelFor(m => m.Content, new { @class = "col-md-2 control-label" })
+    <div class="col-md-10">
+        @Html.TextAreaFor(m => m.Content, new { @class = "form-control", rows = 15 })
+        @Html.ValidationMessageFor(m => m.Content, string.Empty, new { @class = "text-danger" })
+    </div>
 </div>
-<input class="btn btn-success" type="submit" value="Save Answer" />
+<div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+        <input class="btn btn-success" type="submit" value="Save Answer" />
+    </div>
+</div>

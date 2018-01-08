@@ -1,5 +1,6 @@
 ﻿namespace TitaniumForum.Services
 {
+    using Data.Models;
     using Models.Answers;
     using System.Collections.Generic;
 
@@ -14,6 +15,8 @@
         bool Edit(int id, string content);
 
         bool Delete(int id);
+
+        bool Vote(int id, int userId, Direction voteDirection);
 
         AnswerFormServiceModel GetForm(int id);
 

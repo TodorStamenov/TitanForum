@@ -8,8 +8,9 @@
     using Microsoft.AspNet.Identity;
     using Services;
     using Services.Models.Comments;
+    using Services.Models.Questions;
+    using System;
     using System.Web.Mvc;
-    using TitaniumForum.Services.Models.Questions;
 
     [Authorize]
     public class CommentsController : BaseController
@@ -220,6 +221,44 @@
                 nameof(QuestionsController.Details),
                 Questions,
                 new { id = model.QuestionId, model.Page });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Vote(int? id, int? commentId, int? page, string direction)
+        {
+            if (id == null
+                || commentId == null
+                || direction == null)
+            {
+                return BadRequest();
+            }
+
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            bool parsed = Enum.TryParse(direction, true, out Direction voteDirection);
+
+            if (!parsed)
+            {
+                return BadRequest();
+            }
+
+            int userId = User.Identity.GetUserId<int>();
+
+            bool success = this.commentService.Vote((int)commentId, userId, voteDirection);
+
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            return RedirectToAction(
+                nameof(QuestionsController.Details),
+                Questions,
+                new { id, page });
         }
     }
 }

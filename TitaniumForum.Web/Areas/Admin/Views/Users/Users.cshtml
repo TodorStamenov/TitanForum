@@ -12,18 +12,17 @@
 
     @using (Html.BeginForm("Users", "Users", new { area = "Admin" }, FormMethod.Post, new { @class = "form-inline" }))
     {
-
         @Html.HiddenFor(m => m.UserRole)
         @Html.TextBoxFor(m => m.Search, new { @class = "form-control", placeholder = "Search..." })
         <input class="btn btn-success" type="submit" value="Search" />
     }
     <br />
 
-    <a href="@Url.Action("Users", "Users", new { area = "Admin" })" class="btn btn-primary">All Users</a>
+    <a href="@Url.Action("Users", "Users", new { area = "Admin" })" class="btn btn-default">All Users</a>
 
     @foreach (var role in Model.Roles)
     {
-        <a href="@Url.Action("Users", "Users", new { area = "Admin", userRole = role.Name })" class="btn btn-primary">@role.Name</a>
+        <a href="@Url.Action("Users", "Users", new { area = "Admin", userRole = role.Name })" class="btn btn-default">@role.Name</a>
     }
     <table class="table table-hover table-striped">
         <thead>
@@ -40,7 +39,7 @@
                     <td>@user.Username</td>
                     <td>@user.Email</td>
                     <td>
-                        <a href="@Url.Action("EditRoles", "Users", new { area = "Admin", id = user.Id })" class="btn btn-primary">Manage</a>
+                        <a href="@Url.Action("EditRoles", "Users", new { area = "Admin", id = user.Id })" class="btn btn-default">Manage</a>
                     </td>
                 </tr>
             }

@@ -105,6 +105,39 @@
             return true;
         }
 
+        public bool Vote(int id, int userId, Direction voteDirection)
+        {
+            Answer answer = this.db.Answers.Find(id);
+
+            if (answer == null
+                || answer.IsDeleted
+                || answer.Votes.Any(v => v.UserId == userId))
+            {
+                return false;
+            }
+
+            User user = answer.Author;
+
+            answer.Votes.Add(new UserAnswerVote
+            {
+                UserId = userId,
+                Direction = voteDirection
+            });
+
+            if (voteDirection == Direction.Like)
+            {
+                user.Rating++;
+            }
+            else if (voteDirection == Direction.Dislike)
+            {
+                user.Rating--;
+            }
+
+            this.db.Save();
+
+            return true;
+        }
+
         public AnswerFormServiceModel GetForm(int id)
         {
             return this.db
