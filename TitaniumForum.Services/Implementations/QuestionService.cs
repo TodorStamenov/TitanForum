@@ -34,6 +34,15 @@
                 .Any(q => q.Title == title);
         }
 
+        public bool IsLocked(int id)
+        {
+            return this.db
+                .Questions
+                .Where(q => q.Id == id)
+                .Select(q => q.IsLocked)
+                .FirstOrDefault();
+        }
+
         public string GetTitle(int id)
         {
             return this.db
@@ -125,6 +134,7 @@
 
             if (question == null
                 || question.IsDeleted
+                || question.IsLocked
                 || (question.Title != title
                     && this.TitleExists(title)))
             {
@@ -158,71 +168,27 @@
             return true;
         }
 
-        public bool Delete(int id)
+        public bool Report(int id)
         {
             Question question = this.db.Questions.Find(id);
 
             if (question == null
+                || question.IsLocked
                 || question.IsDeleted)
             {
                 return false;
             }
 
-            question.IsDeleted = true;
-
-            foreach (var answer in question.Answers)
+            if (question.IsReported)
             {
-                foreach (var comment in answer.Comments)
-                {
-                    comment.IsDeleted = true;
-                }
-
-                answer.IsDeleted = true;
+                return true;
             }
+
+            question.IsReported = true;
 
             this.db.Save();
 
             return true;
-        }
-
-        public bool Restore(int id)
-        {
-            Question question = this.db.Questions.Find(id);
-            SubCategoryInfoServiceModel subCategoryInfo = this.GetSubCategoryInfo(question.SubCategoryId);
-
-            if (question == null
-                || !question.IsDeleted
-                || subCategoryInfo == null
-                || subCategoryInfo.IsDeleted)
-            {
-                return false;
-            }
-
-            question.IsDeleted = true;
-
-            this.db.Save();
-
-            return true;
-        }
-
-        public bool Lock(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Unlock(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Report(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Conceal(int id)
-        {
-            throw new NotImplementedException();
         }
 
         public bool Vote(int id, int userId, Direction voteDirection)
@@ -231,6 +197,7 @@
 
             if (question == null
                 || question.IsDeleted
+                || question.IsLocked
                 || question.Votes.Any(v => v.UserId == userId))
             {
                 return false;
@@ -292,6 +259,7 @@
                    UpVotes = q.Votes.Count(v => v.Direction == Direction.Like),
                    DownVotes = q.Votes.Count(v => v.Direction == Direction.Dislike),
                    IsOwner = q.AuthorId == userId,
+                   IsLocked = q.IsLocked,
                    HasVoted = q.Votes.Any(v => v.UserId == userId)
                })
                .FirstOrDefault();

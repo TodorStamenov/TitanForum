@@ -8,6 +8,10 @@
 
         public bool IsOwner { get; set; }
 
+        public bool IsLocked { get; set; }
+
+        public bool IsDeleted { get; set; }
+
         public bool HasVoted { get; set; }
     }
 }

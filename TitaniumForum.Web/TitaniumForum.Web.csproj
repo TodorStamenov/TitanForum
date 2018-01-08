@@ -224,6 +224,7 @@
     <Compile Include="Areas\Admin\Models\Users\UserRoleEditViewModel.cs" />
     <Compile Include="Areas\Moderator\Controllers\BaseModeratorController.cs" />
     <Compile Include="Areas\Moderator\Controllers\CategoriesController.cs" />
+    <Compile Include="Areas\Moderator\Controllers\QuestionsController.cs" />
     <Compile Include="Areas\Moderator\Controllers\SubCategoriesController.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\SubCategoryFormViewModel.cs" />
     <Compile Include="Areas\Moderator\ModeratorAreaRegistration.cs" />

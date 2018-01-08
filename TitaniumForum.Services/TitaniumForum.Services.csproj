@@ -63,7 +63,9 @@
     <Compile Include="Areas\Admin\Models\Roles\RoleServiceModel.cs" />
     <Compile Include="Areas\Admin\Models\Users\UserRolesServiceModel.cs" />
     <Compile Include="Areas\Moderator\ICategoryService.cs" />
+    <Compile Include="Areas\Moderator\IModeratorQuestionService.cs" />
     <Compile Include="Areas\Moderator\Implementations\CategoryService.cs" />
+    <Compile Include="Areas\Moderator\Implementations\ModeratorQuestionService.cs" />
     <Compile Include="Areas\Moderator\Implementations\SubCategoryService.cs" />
     <Compile Include="Areas\Moderator\ISubCategoryService.cs" />
     <Compile Include="Areas\Moderator\Models\Categories\CategoryFormServiceModel.cs" />

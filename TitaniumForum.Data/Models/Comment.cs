@@ -14,6 +14,8 @@
 
         public DateTime DateAdded { get; set; }
 
+        public bool IsReported { get; set; }
+
         public bool IsDeleted { get; set; }
 
         public int AnswerId { get; set; }

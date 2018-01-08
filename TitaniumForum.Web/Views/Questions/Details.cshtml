@@ -16,25 +16,20 @@
             <img class="site-image" src="@Model.Question.AuthorProfileImage" alt="Author Image" width="30" height="30" />
             @Model.Question.AuthorUsername
             @Model.Question.Rating Points
-            @if (User.Identity.IsAuthenticated)
+            @if (User.Identity.IsAuthenticated && !Model.Question.IsLocked)
             {
                 using (Html.BeginForm("Report", "Questions", FormMethod.Post, new { @class = "pull-right" }))
                 {
-                    @Html.HiddenFor(m => m.Question.Id)
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
                     <button class="glyphicon-submit" type="submit">
                         <span class="glyphicon glyphicon-alert text-danger glyphicon-button"></span>
                     </button>
                 }
             }
-            @if (User.IsInRole(CommonConstants.ModeratorRole))
+            else if (Model.Question.IsLocked)
             {
-                using (Html.BeginForm("Lock", "Questions", FormMethod.Post, new { @class = "pull-right" }))
-                {
-                    @Html.HiddenFor(m => m.Question.Id)
-                    <button class="glyphicon-submit" type="submit">
-                        <span class="glyphicon glyphicon-lock text-primary glyphicon-button"></span>
-                    </button>
-                }
+                <span class="glyphicon glyphicon-lock text-primary glyphicon-button pull-right"></span>
             }
             <hr />
             <h3>
@@ -52,14 +47,14 @@
                 </a>
             }
             <hr />
-            @if (!User.Identity.IsAuthenticated || Model.Question.HasVoted)
+            @if (!User.Identity.IsAuthenticated || Model.Question.HasVoted || Model.Question.IsLocked)
             {
                 <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
                 @Model.Question.UpVotes
                 <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
                 @Model.Question.DownVotes
             }
-            else
+            else if (User.Identity.IsAuthenticated && !Model.Question.HasVoted && !Model.Question.IsLocked)
             {
                 using (Html.BeginForm("Vote", "Questions", FormMethod.Post, new { @class = "pull-left" }))
                 {
@@ -90,14 +85,17 @@
             <a href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = Model.Question.SubCategoryId })">
                 @Model.Question.SubCategoryName
             </a>
-            @if (User.Identity.IsAuthenticated)
+            @if (User.Identity.IsAuthenticated && (!Model.Question.IsLocked || User.IsInRole(CommonConstants.ModeratorRole)))
             {
                 <hr />
-                <a class="btn btn-success" href="@Url.Action("Create", "Answers", new { questionId = Model.Question.Id, page = Model.CurrentPage })">
-                    Answer
-                </a>
+                if (!Model.Question.IsLocked)
+                {
+                    <a class="btn btn-success" href="@Url.Action("Create", "Answers", new { questionId = Model.Question.Id, page = Model.CurrentPage })">
+                        Answer
+                    </a>
+                }
                 <div class="pull-right">
-                    @if (Model.Question.IsOwner || User.IsInRole(CommonConstants.ModeratorRole))
+                    @if (!Model.Question.IsLocked && (Model.Question.IsOwner || User.IsInRole(CommonConstants.ModeratorRole)))
                     {
                         <a class="btn btn-default" href="@Url.Action("Edit", "Questions", new { id = Model.Question.Id })">
                             Edit
@@ -105,16 +103,31 @@
                     }
                     @if (User.IsInRole(CommonConstants.ModeratorRole))
                     {
-                        using (Html.BeginForm("Lock", "Questions", FormMethod.Post, new { @class = "pull-left" }))
+                        if (Model.Question.IsLocked)
                         {
-                            @Html.HiddenFor(m => m.Question.Id)
-                            <input class="btn btn-default" type="submit" value="Lock" />
+                            using (Html.BeginForm("Unlock", "Questions", new { area = WebConstants.ModeratorArea }, FormMethod.Post, new { @class = "pull-left lock-button" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                                <input class="btn btn-default" type="submit" value="Unlock" />
+                            }
                         }
-                        <a class="btn btn-default" href="@Url.Action("Delete", "Questions", new { id = Model.Question.Id })">
+                        else
+                        {
+                            using (Html.BeginForm("Lock", "Questions", new { area = WebConstants.ModeratorArea }, FormMethod.Post, new { @class = "pull-left lock-button" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                                <input class="btn btn-default" type="submit" value="Lock" />
+                            }
+                        }
+                        <a class="btn btn-default" href="@Url.Action("Delete", "Questions", new { id = Model.Question.Id, area = WebConstants.ModeratorArea })">
                             Delete
                         </a>
                     }
                 </div>
+
+                <div style="clear:both"></div>
             }
         </div>
 
@@ -148,29 +161,17 @@
                 <img class="site-image" src="@answer.AuthorProfileImage" alt="Author Image" width="30" height="30" />
                 @answer.AuthorUsername
                 @answer.Rating Points
-                @if (User.Identity.IsAuthenticated)
-                {
-                    using (Html.BeginForm("Report", "Answers", FormMethod.Post, new { @class = "pull-right" }))
-                    {
-                        @Html.HiddenFor(_ => answer.Id)
-                        @Html.HiddenFor(m => m.Question.Id)
-                        @Html.HiddenFor(m => m.CurrentPage)
-                        <button class="glyphicon-submit" type="submit">
-                            <span class="glyphicon glyphicon-alert text-danger glyphicon-button"></span>
-                        </button>
-                    }
-                }
                 <hr />
                 <p>@answer.Content</p>
                 <hr />
-                @if (!User.Identity.IsAuthenticated || answer.HasVoted)
+                @if (!User.Identity.IsAuthenticated || answer.HasVoted || Model.Question.IsLocked)
                 {
                     <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
                     @answer.UpVotes
                     <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
                     @answer.DownVotes
                 }
-                else
+                else if (User.Identity.IsAuthenticated && !answer.HasVoted && !Model.Question.IsLocked)
                 {
                     using (Html.BeginForm("Vote", "Answers", FormMethod.Post, new { @class = "pull-left" }))
                     {
@@ -199,14 +200,17 @@
                 }
                 <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
                 @answer.DateAdded
-                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity.IsAuthenticated && (!Model.Question.IsLocked || User.IsInRole(CommonConstants.ModeratorRole)))
                 {
                     <hr />
-                    <a class="btn btn-success" href="@Url.Action("Create", "Comments", new { answerId = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage  })">
-                        Comment
-                    </a>
+                    if (!Model.Question.IsLocked)
+                    {
+                        <a class="btn btn-success" href="@Url.Action("Create", "Comments", new { answerId = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage  })">
+                            Comment
+                        </a>
+                    }
                     <div class="pull-right">
-                        @if (answer.IsOwner || User.IsInRole(CommonConstants.ModeratorRole))
+                        @if (!Model.Question.IsLocked && (answer.IsOwner || User.IsInRole(CommonConstants.ModeratorRole)))
                         {
                             <a class="btn btn-default" href="@Url.Action("Edit", "Answers", new { id = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
                                 Edit
@@ -219,6 +223,7 @@
                             </a>
                         }
                     </div>
+                    <div style="clear:both"></div>
                 }
             </div>
 
@@ -228,29 +233,17 @@
                     <img class="site-image" src="@comment.AuthorProfileImage" alt="Author Image" width="30" height="30" />
                     @comment.AuthorUsername
                     @comment.Rating Points
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        using (Html.BeginForm("Report", "Comments", FormMethod.Post, new { @class = "pull-right" }))
-                        {
-                            @Html.HiddenFor(_ => comment.Id)
-                            @Html.HiddenFor(m => m.Question.Id)
-                            @Html.HiddenFor(m => m.CurrentPage)
-                            <button class="glyphicon-submit" type="submit">
-                                <span class="glyphicon glyphicon-alert text-danger glyphicon-button"></span>
-                            </button>
-                        }
-                    }
                     <hr />
                     <p>@comment.Content</p>
                     <hr />
-                    @if (!User.Identity.IsAuthenticated || comment.HasVoted)
+                    @if (!User.Identity.IsAuthenticated || comment.HasVoted || Model.Question.IsLocked)
                     {
                         <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
                         @comment.UpVotes
                         <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
                         @comment.DownVotes
                     }
-                    else
+                    else if (User.Identity.IsAuthenticated && !comment.HasVoted && !Model.Question.IsLocked)
                     {
                         using (Html.BeginForm("Vote", "Comments", FormMethod.Post, new { @class = "pull-left" }))
                         {
@@ -279,21 +272,23 @@
                     }
                     <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
                     @comment.DateAdded
-                    @if (User.Identity.IsAuthenticated)
+                    @if (comment.IsOwner || User.IsInRole(CommonConstants.ModeratorRole))
                     {
-                        if (comment.IsOwner || User.IsInRole(CommonConstants.ModeratorRole))
-                        {
-                            <hr />
-                            <a class="btn btn-default" href="@Url.Action("Edit", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
-                                Edit
-                            </a>
-                        }
-                        if (User.IsInRole(CommonConstants.ModeratorRole))
-                        {
-                            <a class="btn btn-default" href="@Url.Action("Delete", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
-                                Delete
-                            </a>
-                        }
+                        <div class="pull-right">
+                            @if (!Model.Question.IsLocked)
+                            {
+                                <a class="btn btn-default" href="@Url.Action("Edit", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                                    Edit
+                                </a>
+                            }
+                            @if (User.IsInRole(CommonConstants.ModeratorRole))
+                            {
+                                <a class="btn btn-default" href="@Url.Action("Delete", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                                    Delete
+                                </a>
+                            }
+                        </div>
+                        <div style="clear:both"></div>
                     }
                 </div>
             }

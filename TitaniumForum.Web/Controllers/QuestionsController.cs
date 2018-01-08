@@ -96,7 +96,8 @@
 
         public ActionResult Edit(int? id)
         {
-            if (id == null)
+            if (id == null
+                || this.questionService.IsLocked((int)id))
             {
                 return BadRequest();
             }
@@ -180,30 +181,16 @@
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        [Authorize(Roles = CommonConstants.ModeratorRole)]
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return BadRequest();
-            }
-
-            return View();
-        }
-
-        [Authorize(Roles = CommonConstants.ModeratorRole)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Log(LogType.Delete, Questions)]
-        [ActionName(nameof(Delete))]
-        public ActionResult DeletePost(int? id)
+        public ActionResult Report(int? id)
         {
             if (id == null)
             {
                 return BadRequest();
             }
 
-            bool success = this.questionService.Delete((int)id);
+            bool success = this.questionService.Report((int)id);
 
             if (!success)
             {
@@ -213,9 +200,9 @@
             TempData.AddSuccessMessage(string.Format(
                 WebConstants.SuccessfullEntityOperation,
                 Question,
-                WebConstants.Deleted));
+                WebConstants.Reported));
 
-            return RedirectToAction(nameof(All), new { area = string.Empty });
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         [HttpPost]

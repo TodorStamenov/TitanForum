@@ -42,11 +42,13 @@
                 .Where(q => q.Id == questionId)
                 .Select(q => new
                 {
+                    q.IsLocked,
                     q.IsDeleted
                 })
                 .FirstOrDefault();
 
             if (questionInfo == null
+                || questionInfo.IsLocked
                 || questionInfo.IsDeleted)
             {
                 return false;

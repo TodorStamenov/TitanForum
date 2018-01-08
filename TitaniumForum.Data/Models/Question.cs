@@ -21,6 +21,10 @@
 
         public int ViewCount { get; set; }
 
+        public bool IsReported { get; set; }
+
+        public bool IsLocked { get; set; }
+
         public bool IsDeleted { get; set; }
 
         public int SubCategoryId { get; set; }

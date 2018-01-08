@@ -28,12 +28,12 @@ namespace TitaniumForum.Data.Migrations
         private const int MaxTagsPerQuestion = 10;
         private const int MinViewsPerQuestion = 0;
         private const int MaxViewsPerQuestion = 200;
-        private const int MinVotesPerQuestion = 10;
-        private const int MaxVotesPerQuestion = 50;
-        private const int MinVotesPerAnswer = 10;
-        private const int MaxVotesPerAnswer = 50;
-        private const int MinVotesPerComment = 10;
-        private const int MaxVotesPerComment = 50;
+        private const int MinVotesPerQuestion = 0;
+        private const int MaxVotesPerQuestion = 11;
+        private const int MinVotesPerAnswer = 0;
+        private const int MaxVotesPerAnswer = 1;
+        private const int MinVotesPerComment = 0;
+        private const int MaxVotesPerComment = 11;
 
         private static readonly Random random = new Random();
 
@@ -64,22 +64,22 @@ namespace TitaniumForum.Data.Migrations
 
             Task.Run(async () =>
             {
-                await SeedRolesAsync(roleManager, context);
-                await SeedUsersAsync(userManager, UsersCount, context);
-                await SeedUsersAsync(userManager, roleManager, AdminsCount, CommonConstants.AdminRole, context);
-                await SeedUsersAsync(userManager, roleManager, ModeratorsCount, CommonConstants.ModeratorRole, context);
-                await SeedCategoriesAsync(CategoriesCount, context);
-                await SeedSubCategoriesAsync(SubCategoriesCount, context);
-                await SeedTagsAsync(TagsCount, context);
-                await SeedQuestionsAsync(QuestionsCount, context);
-                await SeedAnswersAsync(AnswersCount, context);
-                await SeedCommentsAsync(CommentsCount, context);
+                await this.SeedRolesAsync(roleManager, context);
+                await this.SeedUsersAsync(userManager, UsersCount, context);
+                await this.SeedUsersAsync(userManager, roleManager, AdminsCount, CommonConstants.AdminRole, context);
+                await this.SeedUsersAsync(userManager, roleManager, ModeratorsCount, CommonConstants.ModeratorRole, context);
+                await this.SeedCategoriesAsync(CategoriesCount, context);
+                await this.SeedSubCategoriesAsync(SubCategoriesCount, context);
+                await this.SeedTagsAsync(TagsCount, context);
+                await this.SeedQuestionsAsync(QuestionsCount, context);
+                await this.SeedAnswersAsync(AnswersCount, context);
+                await this.SeedCommentsAsync(CommentsCount, context);
             })
             .GetAwaiter()
             .GetResult();
         }
 
-        private static async Task SeedRolesAsync(RoleManager<Role, int> roleManager, TitaniumForumDbContext context)
+        private async Task SeedRolesAsync(RoleManager<Role, int> roleManager, TitaniumForumDbContext context)
         {
             if (await context.Roles.AnyAsync())
             {
@@ -92,7 +92,7 @@ namespace TitaniumForum.Data.Migrations
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedUsersAsync(UserManager<User, int> userManager, int usersCount, TitaniumForumDbContext context)
+        private async Task SeedUsersAsync(UserManager<User, int> userManager, int usersCount, TitaniumForumDbContext context)
         {
             if (await context.Users.AnyAsync(u => !u.Roles.Any()))
             {
@@ -115,7 +115,7 @@ namespace TitaniumForum.Data.Migrations
             }
         }
 
-        private static async Task SeedUsersAsync(UserManager<User, int> userManager, RoleManager<Role, int> roleManager, int usersCount, string role, TitaniumForumDbContext context)
+        private async Task SeedUsersAsync(UserManager<User, int> userManager, RoleManager<Role, int> roleManager, int usersCount, string role, TitaniumForumDbContext context)
         {
             if (await context.Users.AnyAsync(u => u.Roles.Any(r => r.Role.Name == role)))
             {
@@ -140,7 +140,7 @@ namespace TitaniumForum.Data.Migrations
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedCategoriesAsync(int categoriesCount, TitaniumForumDbContext context)
+        private async Task SeedCategoriesAsync(int categoriesCount, TitaniumForumDbContext context)
         {
             if (await context.Categories.AnyAsync())
             {
@@ -158,7 +158,7 @@ namespace TitaniumForum.Data.Migrations
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedSubCategoriesAsync(int subCategoriesCount, TitaniumForumDbContext context)
+        private async Task SeedSubCategoriesAsync(int subCategoriesCount, TitaniumForumDbContext context)
         {
             if (await context.SubCategories.AnyAsync())
             {
@@ -179,7 +179,7 @@ namespace TitaniumForum.Data.Migrations
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedTagsAsync(int tagsCount, TitaniumForumDbContext context)
+        private async Task SeedTagsAsync(int tagsCount, TitaniumForumDbContext context)
         {
             if (await context.Tags.AnyAsync())
             {
@@ -197,7 +197,7 @@ namespace TitaniumForum.Data.Migrations
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedQuestionsAsync(int questionsCount, TitaniumForumDbContext context)
+        private async Task SeedQuestionsAsync(int questionsCount, TitaniumForumDbContext context)
         {
             if (await context.Questions.AnyAsync())
             {
@@ -216,6 +216,9 @@ namespace TitaniumForum.Data.Migrations
                     Content = CommonConstants.lorem,
                     DateAdded = DateTime.UtcNow.AddDays(-i).AddHours(-i).AddMinutes(-i),
                     ViewCount = random.Next(MinViewsPerQuestion, MaxViewsPerQuestion),
+                    IsReported = this.GetRandomBool(),
+                    IsLocked = this.GetRandomBool(),
+                    IsDeleted = this.GetRandomBool(),
                     AuthorId = users[random.Next(0, users.Count)].Id,
                     SubCategoryId = subCategoryIds[random.Next(0, subCategoryIds.Count)]
                 };
@@ -274,7 +277,7 @@ namespace TitaniumForum.Data.Migrations
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedAnswersAsync(int answersCount, TitaniumForumDbContext context)
+        private async Task SeedAnswersAsync(int answersCount, TitaniumForumDbContext context)
         {
             if (await context.Answers.AnyAsync())
             {
@@ -284,7 +287,6 @@ namespace TitaniumForum.Data.Migrations
             List<User> users = await context.Users.ToListAsync();
             var questionInfo = await context
                 .Questions
-
                 .Select(q => new
                 {
                     q.Id,
@@ -301,6 +303,8 @@ namespace TitaniumForum.Data.Migrations
                     Content = CommonConstants.lorem.Substring(0, CommonConstants.lorem.Length / 2),
                     AuthorId = users[random.Next(0, users.Count)].Id,
                     DateAdded = question.DateAdded.AddHours(i).AddMinutes(i),
+                    IsReported = this.GetRandomBool(),
+                    IsDeleted = this.GetRandomBool(),
                     QuestionId = question.Id
                 };
 
@@ -340,7 +344,7 @@ namespace TitaniumForum.Data.Migrations
             await context.SaveChangesAsync();
         }
 
-        private static async Task SeedCommentsAsync(int commentsCount, TitaniumForumDbContext context)
+        private async Task SeedCommentsAsync(int commentsCount, TitaniumForumDbContext context)
         {
             if (await context.Comments.AnyAsync())
             {
@@ -350,7 +354,6 @@ namespace TitaniumForum.Data.Migrations
             List<User> users = await context.Users.ToListAsync();
             var answerInfo = await context
                 .Answers
-
                 .Select(q => new
                 {
                     q.Id,
@@ -367,6 +370,8 @@ namespace TitaniumForum.Data.Migrations
                     Content = CommonConstants.lorem.Substring(0, CommonConstants.lorem.Length / 4),
                     AuthorId = users[random.Next(0, users.Count)].Id,
                     DateAdded = answer.DateAdded.AddHours(i).AddMinutes(i),
+                    IsReported = this.GetRandomBool(),
+                    IsDeleted = this.GetRandomBool(),
                     AnswerId = answer.Id
                 };
 
@@ -404,6 +409,11 @@ namespace TitaniumForum.Data.Migrations
             }
 
             await context.SaveChangesAsync();
+        }
+
+        private bool GetRandomBool()
+        {
+            return random.Next(0, 2) == 0 ? false : true;
         }
     }
 }

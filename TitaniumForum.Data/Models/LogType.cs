@@ -9,6 +9,7 @@
         Unlock = 4,
         AddToRole = 5,
         RemoveFromRole = 6,
-        Restore = 7
+        Restore = 7,
+        Conceal = 8
     }
 }

@@ -10,6 +10,8 @@
 
         bool TitleExists(string title);
 
+        bool IsLocked(int questionId);
+
         string GetTitle(int id);
 
         int Total(string search);
@@ -24,17 +26,7 @@
 
         bool Edit(int id, string title, string content, string tags, int subCategoryId);
 
-        bool Delete(int id);
-
-        bool Restore(int id);
-
-        bool Lock(int id);
-
-        bool Unlock(int id);
-
         bool Report(int id);
-
-        bool Conceal(int id);
 
         bool Vote(int id, int userId, Direction voteDirection);
 

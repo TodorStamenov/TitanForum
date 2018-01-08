@@ -9,6 +9,10 @@
         public const string Edited = "Edited";
         public const string Deleted = "Deleted";
         public const string Restored = "Restored";
+        public const string Reported = "Reported";
+        public const string Concealed = "Concealed";
+        public const string Locked = "Locked";
+        public const string Unlocked = "Unlocked";
 
         public const string TempDataSuccessMessage = "SuccessMessage";
         public const string TempDataErrorMessage = "ErrorMessage";

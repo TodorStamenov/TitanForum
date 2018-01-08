@@ -78,3 +78,7 @@ input, select, textarea {
 .glyphicon-vote-button {
     font-size: 15px;
 }
+
+.lock-button {
+    margin-right: 5px;
+}

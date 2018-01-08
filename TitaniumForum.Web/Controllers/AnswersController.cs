@@ -20,15 +20,18 @@
         private const string Questions = "Questions";
 
         private readonly IAnswerService answerService;
+        private readonly IQuestionService questionService;
 
-        public AnswersController(IAnswerService answerService)
+        public AnswersController(IAnswerService answerService, IQuestionService questionService)
         {
             this.answerService = answerService;
+            this.questionService = questionService;
         }
 
         public ActionResult Create(int? questionId, int? page)
         {
-            if (questionId == null)
+            if (questionId == null
+                || this.questionService.IsLocked((int)questionId))
             {
                 return BadRequest();
             }
