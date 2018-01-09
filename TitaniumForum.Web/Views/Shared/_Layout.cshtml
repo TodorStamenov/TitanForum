@@ -22,7 +22,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="@Url.Action("Ranking", "Users", new { area = string.Empty })">Ranking</a></li>
                     <li>
-                        @using (Html.BeginForm("All", "Questions", FormMethod.Get, new { @class = "form-inline search-form" }))
+                        @using (Html.BeginForm("All", "Questions", new { area = string.Empty }, FormMethod.Get, new { @class = "form-inline search-form" }))
                         {
                             <input class="form-control" type="text" name="search" placeholder="Search...">
                             <button class="btn btn-success" type="submit">Search</button>

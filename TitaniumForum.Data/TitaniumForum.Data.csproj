@@ -79,6 +79,10 @@
     <Compile Include="Migrations\201801081045232_IsReportedAndIsLockedColumns.Designer.cs">
       <DependentUpon>201801081045232_IsReportedAndIsLockedColumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801091343464_RemovedColumnIsReported.cs" />
+    <Compile Include="Migrations\201801091343464_RemovedColumnIsReported.Designer.cs">
+      <DependentUpon>201801091343464_RemovedColumnIsReported.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModelConfigurations\AnswerConfiguraiton.cs" />
     <Compile Include="ModelConfigurations\CategoryConfiguration.cs" />
@@ -137,6 +141,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801081045232_IsReportedAndIsLockedColumns.resx">
       <DependentUpon>201801081045232_IsReportedAndIsLockedColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801091343464_RemovedColumnIsReported.resx">
+      <DependentUpon>201801091343464_RemovedColumnIsReported.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

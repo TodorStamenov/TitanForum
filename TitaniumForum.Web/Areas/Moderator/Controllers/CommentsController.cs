@@ -4,12 +4,14 @@
     using Infrastructure;
     using Infrastructure.Extensions;
     using Infrastructure.Filters;
+    using Models.Comments;
     using Services.Areas.Moderator;
     using Services.Models.Questions;
     using System.Web.Mvc;
 
     public class CommentsController : BaseModeratorController
     {
+        private const int CommentsPerPage = 5;
         private const string Comment = "Comment";
         private const string Comments = "Comments";
         private const string Details = "Details";
@@ -104,9 +106,25 @@
                 new { id = questionId, area = string.Empty });
         }
 
-        public ActionResult Deleted()
+        public ActionResult Deleted(int? page, string search)
         {
-            return View();
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            int questionsCount = this.commentService.DeletedCount(search);
+
+            ListCommetnsModeratorViewModel model = new ListCommetnsModeratorViewModel
+            {
+                CurrentPage = (int)page,
+                Search = search,
+                TotalEntries = questionsCount,
+                EntriesPerPage = CommentsPerPage,
+                Comments = this.commentService.Deleted((int)page, CommentsPerPage, search)
+            };
+
+            return View(model);
         }
     }
 }

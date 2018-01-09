@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ListDeletedCommentsServiceModel>
+
+@foreach (var comment in Model)
+{
+    <div class="panel panel-default site-panel">
+        <img class="site-image" src="@comment.AuthorProfileImage" alt="Author Image" width="30" height="30" />
+        @comment.AuthorUsername
+        @comment.Rating Points
+        <hr />
+        <p>@comment.Content</p>
+        <hr />
+        <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
+        @comment.UpVotes
+        <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
+        @comment.DownVotes
+        <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
+        @comment.DateAdded
+        @if (comment.IsDeleted && !comment.IsAnswerDeleted)
+        {
+            <hr />
+            using (Html.BeginForm("Restore", "Comments", new { area = WebConstants.ModeratorArea }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden(nameof(comment.Id), comment.Id)
+                @Html.Hidden(nameof(comment.QuestionId), comment.QuestionId)
+                <input class="btn btn-default" type="submit" value="Restore" />
+            }
+        }
+    </div>
+}

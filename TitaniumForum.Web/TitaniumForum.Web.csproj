@@ -228,6 +228,8 @@
     <Compile Include="Areas\Moderator\Controllers\CommentsController.cs" />
     <Compile Include="Areas\Moderator\Controllers\QuestionsController.cs" />
     <Compile Include="Areas\Moderator\Controllers\SubCategoriesController.cs" />
+    <Compile Include="Areas\Moderator\Models\Answers\ListAnswersModeratorViewModel.cs" />
+    <Compile Include="Areas\Moderator\Models\Comments\ListCommetnsModeratorViewModel.cs" />
     <Compile Include="Areas\Moderator\Models\Questions\ListQuestionsModeratorViewModel.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\SubCategoryFormViewModel.cs" />
     <Compile Include="Areas\Moderator\ModeratorAreaRegistration.cs" />
@@ -301,6 +303,11 @@
     <Content Include="Areas\Moderator\Views\Questions\Reported.cshtml" />
     <Content Include="Areas\Moderator\Views\Questions\Deleted.cshtml" />
     <Content Include="Areas\Moderator\Views\Questions\_ListDeletedQuestions.cshtml" />
+    <Content Include="Areas\Moderator\Views\Answers\Deleted.cshtml" />
+    <Content Include="Areas\Moderator\Views\Answers\_ListDeletedAnswers.cshtml" />
+    <Content Include="Areas\Moderator\Views\Comments\Deleted.cshtml" />
+    <Content Include="Areas\Moderator\Views\Comments\_ListDeletedComments.cshtml" />
+    <Content Include="Areas\Moderator\Views\Shared\_PostTypeButtons.cshtml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />

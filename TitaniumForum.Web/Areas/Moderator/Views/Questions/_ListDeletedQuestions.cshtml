@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ListQuestionsServiceModel>
+﻿@model IEnumerable<ListDeletedQuestionsServiceModel>
 
 @foreach (var question in Model)
 {
@@ -36,12 +36,15 @@
             {
                 <span>No answers for this question</span>
             }
-            <hr />
-            @using (Html.BeginForm("Restore", "Questions", new { area = WebConstants.ModeratorArea }, FormMethod.Post))
+            @if (question.IsDeleted && !question.IsSubCategoryDeleted)
             {
-                @Html.AntiForgeryToken()
-                @Html.Hidden(nameof(question.Id), question.Id)
-                <input class="btn btn-default" type="submit" value="Restore" />
+                <hr />
+                using (Html.BeginForm("Restore", "Questions", new { area = WebConstants.ModeratorArea }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden(nameof(question.Id), question.Id)
+                    <input class="btn btn-default" type="submit" value="Restore" />
+                }
             }
         </div>
     </div>

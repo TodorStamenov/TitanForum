@@ -4,12 +4,14 @@
     using Infrastructure;
     using Infrastructure.Extensions;
     using Infrastructure.Filters;
+    using Models.Answers;
     using Services.Areas.Moderator;
     using Services.Models.Questions;
     using System.Web.Mvc;
 
     public class AnswersController : BaseModeratorController
     {
+        private const int AnswersPerPage = 5;
         private const string Answer = "Answer";
         private const string Answers = "Answers";
         private const string Details = "Details";
@@ -104,9 +106,25 @@
                 new { id = questionId, area = string.Empty });
         }
 
-        public ActionResult Deleted()
+        public ActionResult Deleted(int? page, string search)
         {
-            return View();
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            int questionsCount = this.answerService.DeletedCount(search);
+
+            ListAnswersModeratorViewModel model = new ListAnswersModeratorViewModel
+            {
+                CurrentPage = (int)page,
+                Search = search,
+                TotalEntries = questionsCount,
+                EntriesPerPage = AnswersPerPage,
+                Answers = this.answerService.Deleted((int)page, AnswersPerPage, search)
+            };
+
+            return View(model);
         }
     }
 }

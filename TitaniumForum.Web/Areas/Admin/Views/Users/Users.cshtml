@@ -18,11 +18,11 @@
     }
     <br />
 
-    <a href="@Url.Action("Users", "Users", new { area = "Admin" })" class="btn btn-default">All Users</a>
+    <a href="@Url.Action("Users", "Users", new { area = WebConstants.AdminArea })" class="btn btn-default">All Users</a>
 
     @foreach (var role in Model.Roles)
     {
-        <a href="@Url.Action("Users", "Users", new { area = "Admin", userRole = role.Name })" class="btn btn-default">@role.Name</a>
+        <a href="@Url.Action("Users", "Users", new { area = WebConstants.AdminArea, userRole = role.Name })" class="btn btn-default">@role.Name</a>
     }
     <br />
     <br />

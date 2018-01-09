@@ -72,9 +72,12 @@
     <Compile Include="Areas\Moderator\Implementations\ModeratorQuestionService.cs" />
     <Compile Include="Areas\Moderator\Implementations\SubCategoryService.cs" />
     <Compile Include="Areas\Moderator\ISubCategoryService.cs" />
+    <Compile Include="Areas\Moderator\Models\Answers\ListDeletedAnswersServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\Categories\CategoryFormServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\Categories\CategoryInfoServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\Categories\ListCategoriesServiceModel.cs" />
+    <Compile Include="Areas\Moderator\Models\Comments\ListDeletedCommentsServiceModel.cs" />
+    <Compile Include="Areas\Moderator\Models\Questions\ListDeletedQuestionsServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\ListSubCategoriesServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\SubCategoryFormServiceModel.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\SubCategoryInfoServiceModel.cs" />
@@ -85,7 +88,9 @@
     <Compile Include="Implementations\QuestionService.cs" />
     <Compile Include="Implementations\TagService.cs" />
     <Compile Include="Implementations\UserService.cs" />
+    <Compile Include="Infrastructure\Extensions\AnswerExtensions.cs" />
     <Compile Include="Infrastructure\Extensions\ByteArrayExtensions.cs" />
+    <Compile Include="Infrastructure\Extensions\CommentExtensions.cs" />
     <Compile Include="Infrastructure\Extensions\LogExtensions.cs" />
     <Compile Include="Infrastructure\Extensions\QuestionExtensions.cs" />
     <Compile Include="Infrastructure\Extensions\UserExtensions.cs" />

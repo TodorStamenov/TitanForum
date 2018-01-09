@@ -4,6 +4,7 @@
     using Data;
     using Data.Models;
     using Infrastructure.Extensions;
+    using Models.Questions;
     using Models.SubCategories;
     using Services.Models.Questions;
     using System.Collections.Generic;
@@ -162,7 +163,7 @@
                 .ToList();
         }
 
-        public IEnumerable<ListQuestionsServiceModel> Deleted(int page, int pageSize, string search)
+        public IEnumerable<ListDeletedQuestionsServiceModel> Deleted(int page, int pageSize, string search)
         {
             return this.db
                 .Questions
@@ -172,7 +173,7 @@
                 .OrderByDescending(q => q.DateAdded)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ProjectToListModel()
+                .ProjectToDeletedListModel()
                 .ToList();
         }
     }

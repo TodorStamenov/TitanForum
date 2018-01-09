@@ -1,5 +1,6 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator
 {
+    using Models.Questions;
     using Services.Models.Questions;
     using System.Collections.Generic;
 
@@ -19,6 +20,6 @@
 
         IEnumerable<ListQuestionsServiceModel> Reported(int questionsCount);
 
-        IEnumerable<ListQuestionsServiceModel> Deleted(int page, int pageSize, string search);
+        IEnumerable<ListDeletedQuestionsServiceModel> Deleted(int page, int pageSize, string search);
     }
 }

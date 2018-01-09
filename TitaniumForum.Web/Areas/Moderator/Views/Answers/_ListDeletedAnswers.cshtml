@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ListDeletedAnswersServiceModel>
+
+@foreach (var answer in Model)
+{
+    <div class="panel panel-default site-panel">
+        <img class="site-image" src="@answer.AuthorProfileImage" alt="Author Image" width="30" height="30" />
+        @answer.AuthorUsername
+        @answer.Rating Points
+        <hr />
+        <p>@answer.Content</p>
+        <hr />
+        <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
+        @answer.UpVotes
+        <span class="glyphicon glyphicon-hand-down text-danger site-glyphicon"></span>
+        @answer.DownVotes
+        <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
+        @answer.DateAdded
+        @if (answer.IsDeleted && !answer.IsQuestionDeleted)
+        {
+            <hr />
+            using (Html.BeginForm("Restore", "Answers", new { area = WebConstants.ModeratorArea }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden(nameof(answer.Id), answer.Id)
+                @Html.Hidden(nameof(answer.QuestionId), answer.QuestionId)
+                <input class="btn btn-default" type="submit" value="Restore" />
+            }
+        }
+    </div>
+}

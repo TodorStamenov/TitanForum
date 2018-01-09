@@ -21,7 +21,7 @@ namespace TitaniumForum.Data.Migrations
         private const int CategoriesCount = 3;
         private const int SubCategoriesCount = CategoriesCount * 3;
         private const int QuestionsCount = SubCategoriesCount * 20;
-        private const int AnswersCount = QuestionsCount * 5;
+        private const int AnswersCount = QuestionsCount * 10;
         private const int CommentsCount = QuestionsCount;
         private const int TagsCount = 50;
         private const int MinTagsPerQuestion = 3;
@@ -210,15 +210,24 @@ namespace TitaniumForum.Data.Migrations
 
             for (int i = 1; i <= questionsCount; i++)
             {
+                bool isDeleted = this.GetRandomBool();
+                bool isLocked = this.GetRandomBool();
+                bool isReported = this.GetRandomBool();
+
+                if (isDeleted || isLocked)
+                {
+                    isReported = false;
+                }
+
                 Question question = new Question
                 {
                     Title = $"Question Title {i}",
                     Content = CommonConstants.lorem,
                     DateAdded = DateTime.UtcNow.AddDays(-i).AddHours(-i).AddMinutes(-i),
                     ViewCount = random.Next(MinViewsPerQuestion, MaxViewsPerQuestion),
-                    IsReported = this.GetRandomBool(),
-                    IsLocked = this.GetRandomBool(),
-                    IsDeleted = this.GetRandomBool(),
+                    IsReported = isReported,
+                    IsLocked = isLocked,
+                    IsDeleted = isDeleted,
                     AuthorId = users[random.Next(0, users.Count)].Id,
                     SubCategoryId = subCategoryIds[random.Next(0, subCategoryIds.Count)]
                 };
@@ -290,7 +299,8 @@ namespace TitaniumForum.Data.Migrations
                 .Select(q => new
                 {
                     q.Id,
-                    q.DateAdded
+                    q.DateAdded,
+                    q.IsDeleted
                 })
                 .ToListAsync();
 
@@ -303,8 +313,7 @@ namespace TitaniumForum.Data.Migrations
                     Content = CommonConstants.lorem.Substring(0, CommonConstants.lorem.Length / 2),
                     AuthorId = users[random.Next(0, users.Count)].Id,
                     DateAdded = question.DateAdded.AddHours(i).AddMinutes(i),
-                    IsReported = this.GetRandomBool(),
-                    IsDeleted = this.GetRandomBool(),
+                    IsDeleted = question.IsDeleted ? true : this.GetRandomBool(),
                     QuestionId = question.Id
                 };
 
@@ -357,7 +366,8 @@ namespace TitaniumForum.Data.Migrations
                 .Select(q => new
                 {
                     q.Id,
-                    q.DateAdded
+                    q.DateAdded,
+                    q.IsDeleted
                 })
                 .ToListAsync();
 
@@ -370,8 +380,7 @@ namespace TitaniumForum.Data.Migrations
                     Content = CommonConstants.lorem.Substring(0, CommonConstants.lorem.Length / 4),
                     AuthorId = users[random.Next(0, users.Count)].Id,
                     DateAdded = answer.DateAdded.AddHours(i).AddMinutes(i),
-                    IsReported = this.GetRandomBool(),
-                    IsDeleted = this.GetRandomBool(),
+                    IsDeleted = answer.IsDeleted ? true : this.GetRandomBool(),
                     AnswerId = answer.Id
                 };
 
