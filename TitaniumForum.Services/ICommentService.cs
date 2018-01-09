@@ -11,8 +11,6 @@
 
         bool Edit(int id, string content);
 
-        bool Delete(int id);
-
         bool Vote(int id, int userId, Direction voteDirection);
 
         CommentFormServiceModel GetForm(int id);

@@ -4,11 +4,9 @@
     using Data.Models;
     using Infrastructure;
     using Infrastructure.Extensions;
-    using Infrastructure.Filters;
     using Microsoft.AspNet.Identity;
     using Services;
     using Services.Models.Answers;
-    using Services.Models.Questions;
     using System;
     using System.Web.Mvc;
 
@@ -93,7 +91,8 @@
 
         public ActionResult Edit(int? id, int? questionId, int? page)
         {
-            if (id == null || questionId == null)
+            if (id == null
+                || questionId == null)
             {
                 return BadRequest();
             }
@@ -113,13 +112,14 @@
             }
 
             AnswerFormServiceModel model = this.answerService.GetForm((int)id);
-            model.RedirectInfo.Page = page;
-            model.RedirectInfo.QuestionId = questionId;
 
             if (model == null)
             {
                 return BadRequest();
             }
+
+            model.RedirectInfo.Page = page;
+            model.RedirectInfo.QuestionId = questionId;
 
             return View(model);
         }
@@ -169,63 +169,6 @@
                 nameof(QuestionsController.Details),
                 Questions,
                 new { id = model.RedirectInfo.QuestionId, model.RedirectInfo.Page });
-        }
-
-        [Authorize(Roles = CommonConstants.ModeratorRole)]
-        public ActionResult Delete(int? id, int? questionId, int? page)
-        {
-            if (id == null || questionId == null)
-            {
-                return BadRequest();
-            }
-
-            if (page == null || page < 1)
-            {
-                page = 1;
-            }
-
-            QuestionRedirectServiceModel model = new QuestionRedirectServiceModel
-            {
-                Page = page,
-                QuestionId = questionId
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = CommonConstants.ModeratorRole)]
-        [ValidateAntiForgeryToken]
-        [ActionName(nameof(Delete))]
-        [Log(LogType.Delete, Answers)]
-        public ActionResult DeletePost(int? id, QuestionRedirectServiceModel model)
-        {
-            if (id == null || model.QuestionId == null)
-            {
-                return BadRequest();
-            }
-
-            if (model.Page == null || model.Page < 1)
-            {
-                model.Page = 1;
-            }
-
-            bool success = this.answerService.Delete((int)id);
-
-            if (!success)
-            {
-                return BadRequest();
-            }
-
-            TempData.AddSuccessMessage(string.Format(
-                WebConstants.SuccessfullEntityOperation,
-                Answer,
-                WebConstants.Deleted));
-
-            return RedirectToAction(
-                nameof(QuestionsController.Details),
-                Questions,
-                new { id = model.QuestionId, model.Page });
         }
 
         [HttpPost]

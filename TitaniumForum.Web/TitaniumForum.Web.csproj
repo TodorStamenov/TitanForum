@@ -222,10 +222,13 @@
     <Compile Include="Areas\Admin\Models\Logs\ListLogsViewModel.cs" />
     <Compile Include="Areas\Admin\Models\Users\ListUsersViewModel.cs" />
     <Compile Include="Areas\Admin\Models\Users\UserRoleEditViewModel.cs" />
+    <Compile Include="Areas\Moderator\Controllers\AnswersController.cs" />
     <Compile Include="Areas\Moderator\Controllers\BaseModeratorController.cs" />
     <Compile Include="Areas\Moderator\Controllers\CategoriesController.cs" />
+    <Compile Include="Areas\Moderator\Controllers\CommentsController.cs" />
     <Compile Include="Areas\Moderator\Controllers\QuestionsController.cs" />
     <Compile Include="Areas\Moderator\Controllers\SubCategoriesController.cs" />
+    <Compile Include="Areas\Moderator\Models\Questions\ListQuestionsModeratorViewModel.cs" />
     <Compile Include="Areas\Moderator\Models\SubCategories\SubCategoryFormViewModel.cs" />
     <Compile Include="Areas\Moderator\ModeratorAreaRegistration.cs" />
     <Compile Include="Controllers\AnswersController.cs" />
@@ -244,7 +247,6 @@
     <Compile Include="Infrastructure\Extensions\TempDataDictionaryExtensions.cs" />
     <Compile Include="Infrastructure\Filters\LogAttribute.cs" />
     <Compile Include="Infrastructure\Helpers\BasePageViewModel.cs" />
-    <Compile Include="Infrastructure\Helpers\ControllerHelpers.cs" />
     <Compile Include="Infrastructure\Mapping\AutoMapperProfile.cs" />
     <Compile Include="Infrastructure\WebConstants.cs" />
     <Compile Include="Models\Account\LoginViewModel.cs" />
@@ -296,6 +298,9 @@
     <Content Include="Areas\Moderator\Views\SubCategories\Edit.cshtml" />
     <Content Include="Areas\Moderator\Views\SubCategories\Delete.cshtml" />
     <Content Include="Areas\Moderator\Views\SubCategories\_SubCategoryForm.cshtml" />
+    <Content Include="Areas\Moderator\Views\Questions\Reported.cshtml" />
+    <Content Include="Areas\Moderator\Views\Questions\Deleted.cshtml" />
+    <Content Include="Areas\Moderator\Views\Questions\_ListDeletedQuestions.cshtml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -341,14 +346,14 @@
     <Content Include="Views\Questions\_QuestionForm.cshtml" />
     <Content Include="Views\Questions\ByTag.cshtml" />
     <Content Include="Views\Questions\Edit.cshtml" />
-    <Content Include="Views\Questions\Delete.cshtml" />
+    <Content Include="Areas\Moderator\Views\Questions\Delete.cshtml" />
     <Content Include="Views\Answers\Create.cshtml" />
     <Content Include="Views\Answers\Edit.cshtml" />
-    <Content Include="Views\Answers\Delete.cshtml" />
+    <Content Include="Areas\Moderator\Views\Answers\Delete.cshtml" />
     <Content Include="Views\Answers\_AnswerForm.cshtml" />
     <Content Include="Views\Comments\Create.cshtml" />
     <Content Include="Views\Comments\Edit.cshtml" />
-    <Content Include="Views\Comments\Delete.cshtml" />
+    <Content Include="Areas\Moderator\Views\Comments\Delete.cshtml" />
     <Content Include="Views\Comments\_CommentForm.cshtml" />
   </ItemGroup>
   <ItemGroup />

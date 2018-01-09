@@ -18,6 +18,16 @@
             this.db = db;
         }
 
+        public int DeletedCount(string search)
+        {
+            return this.db
+                .Questions
+                .AllEntries()
+                .Where(q => q.IsDeleted)
+                .Filter(search)
+                .Count();
+        }
+
         public bool Delete(int id)
         {
             Question question = this.db.Questions.Find(id);
@@ -58,7 +68,17 @@
                 return false;
             }
 
-            question.IsDeleted = true;
+            question.IsDeleted = false;
+
+            foreach (var answer in question.Answers)
+            {
+                foreach (var comment in answer.Comments)
+                {
+                    comment.IsDeleted = false;
+                }
+
+                answer.IsDeleted = false;
+            }
 
             this.db.Save();
 
@@ -130,29 +150,14 @@
                 .FirstOrDefault();
         }
 
-        public IEnumerable<ListQuestionsServiceModel> Reported(int page, int pageSize)
+        public IEnumerable<ListQuestionsServiceModel> Reported(int questionsCount)
         {
             return this.db
                 .Questions
                 .AllEntries()
                 .Where(q => q.IsReported)
                 .OrderByDescending(q => q.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ProjectToListModel()
-                .ToList();
-        }
-
-        public IEnumerable<ListQuestionsServiceModel> Locked(int page, int pageSize, string search)
-        {
-            return this.db
-                .Questions
-                .AllEntries()
-                .Where(q => q.IsLocked)
-                .Filter(search)
-                .OrderByDescending(q => q.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Take(questionsCount)
                 .ProjectToListModel()
                 .ToList();
         }

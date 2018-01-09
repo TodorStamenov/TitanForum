@@ -1,19 +1,13 @@
 ﻿namespace TitaniumForum.Web.Models.Questions
 {
-    using Infrastructure.Helpers;
-    using Services.Models.Questions;
-    using System.Collections.Generic;
+    using Areas.Moderator.Models.Questions;
 
-    public class ListQuestionsViewModel : BasePageViewModel
+    public class ListQuestionsViewModel : ListQuestionsModeratorViewModel
     {
-        public string Search { get; set; }
-
         public int? CategoryId { get; set; }
 
         public int? SubCategoryId { get; set; }
 
         public int? TagId { get; set; }
-
-        public IEnumerable<ListQuestionsServiceModel> Questions { get; set; }
     }
 }

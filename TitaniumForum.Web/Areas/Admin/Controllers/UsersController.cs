@@ -160,7 +160,8 @@
             {
                 Search = search,
                 CurrentPage = (int)page,
-                TotalPages = ControllerHelpers.GetTotalPages(totalLogs, LogsPerPage),
+                TotalEntries = totalLogs,
+                EntriesPerPage = LogsPerPage,
                 Logs = this.userService.Logs((int)page, LogsPerPage, search),
             };
 
@@ -181,7 +182,8 @@
                 Search = search,
                 CurrentPage = (int)page,
                 UserRole = userRole,
-                TotalPages = ControllerHelpers.GetTotalPages(totalUsers, UsersPerPage),
+                TotalEntries = totalUsers,
+                EntriesPerPage = UsersPerPage,
                 Users = this.userService.All((int)page, userRole, search, UsersPerPage),
                 Roles = this.userService.AllRoles(),
             };

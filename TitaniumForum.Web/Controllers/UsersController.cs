@@ -28,7 +28,8 @@
             ListUserRankingViewModel model = new ListUserRankingViewModel
             {
                 CurrentPage = (int)page,
-                TotalPages = ControllerHelpers.GetTotalPages(totalUsers, UsersPerPage),
+                TotalEntries = totalUsers,
+                EntriesPerPage = UsersPerPage,
                 Users = this.userService.Ranking((int)page, UsersPerPage)
             };
 

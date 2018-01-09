@@ -1,15 +1,19 @@
 ﻿namespace TitaniumForum.Web.Areas.Moderator.Controllers
 {
-    using Common;
     using Data.Models;
     using Infrastructure;
     using Infrastructure.Extensions;
     using Infrastructure.Filters;
+    using Models.Questions;
     using Services.Areas.Moderator;
+    using Services.Models.Questions;
+    using System.Collections.Generic;
     using System.Web.Mvc;
 
     public class QuestionsController : BaseModeratorController
     {
+        private const int QuestionsPerPage = 5;
+        private const int ReportedQuestionsCount = 5;
         private const string All = "All";
         private const string Details = "Details";
         private const string Question = "Question";
@@ -101,7 +105,7 @@
                 WebConstants.Concealed));
 
             return RedirectToAction(
-                All,
+                Details,
                 Questions,
                 new { id, area = string.Empty });
         }
@@ -168,9 +172,38 @@
                 WebConstants.Restored));
 
             return RedirectToAction(
-                All,
+                Details,
                 Questions,
-                new { area = string.Empty });
+                new { id, area = string.Empty });
+        }
+
+        public ActionResult Reported()
+        {
+            IEnumerable<ListQuestionsServiceModel> model
+                = this.questionService.Reported(ReportedQuestionsCount);
+
+            return View(model);
+        }
+
+        public ActionResult Deleted(int? page, string search)
+        {
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+
+            int questionsCount = this.questionService.DeletedCount(search);
+
+            ListQuestionsModeratorViewModel model = new ListQuestionsModeratorViewModel
+            {
+                CurrentPage = (int)page,
+                Search = search,
+                TotalEntries = questionsCount,
+                EntriesPerPage = QuestionsPerPage,
+                Questions = this.questionService.Deleted((int)page, QuestionsPerPage, search)
+            };
+
+            return View(model);
         }
     }
 }

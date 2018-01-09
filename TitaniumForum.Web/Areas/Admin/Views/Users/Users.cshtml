@@ -10,7 +10,7 @@
 <div class="row">
     <h2>@ViewData["Title"] @(Model.UserRole != null && Model.UserRole != string.Empty ? $"in Role {Model.UserRole}" : string.Empty)</h2>
 
-    @using (Html.BeginForm("Users", "Users", new { area = "Admin" }, FormMethod.Post, new { @class = "form-inline" }))
+    @using (Html.BeginForm("Users", "Users", new { area = WebConstants.AdminArea }, FormMethod.Post, new { @class = "form-inline" }))
     {
         @Html.HiddenFor(m => m.UserRole)
         @Html.TextBoxFor(m => m.Search, new { @class = "form-control", placeholder = "Search..." })
@@ -24,6 +24,8 @@
     {
         <a href="@Url.Action("Users", "Users", new { area = "Admin", userRole = role.Name })" class="btn btn-default">@role.Name</a>
     }
+    <br />
+    <br />
     <table class="table table-hover table-striped">
         <thead>
             <tr>

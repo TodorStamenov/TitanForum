@@ -20,15 +20,19 @@
         private const string Questions = "Questions";
 
         private readonly ICommentService commentService;
+        private readonly IQuestionService questionService;
 
-        public CommentsController(ICommentService commentService)
+        public CommentsController(ICommentService commentService, IQuestionService questionService)
         {
             this.commentService = commentService;
+            this.questionService = questionService;
         }
 
         public ActionResult Create(int? answerId, int? questionId, int? page)
         {
-            if (answerId == null || questionId == null)
+            if (answerId == null
+                || questionId == null
+                || this.questionService.IsLocked((int)questionId))
             {
                 return BadRequest();
             }
@@ -100,21 +104,21 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool canEdit = this.commentService.CanEdit((int)id, userId);
-
-            if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
+            if (!this.commentService.CanEdit((int)id, userId)
+                && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
 
             CommentFormServiceModel model = this.commentService.GetForm((int)id);
-            model.RedirectInfo.Page = page;
-            model.RedirectInfo.QuestionId = questionId;
 
             if (model == null)
             {
                 return BadRequest();
             }
+
+            model.RedirectInfo.Page = page;
+            model.RedirectInfo.QuestionId = questionId;
 
             return View(model);
         }
@@ -141,9 +145,8 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool canEdit = this.commentService.CanEdit((int)id, userId);
-
-            if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
+            if (!this.commentService.CanEdit((int)id, userId)
+                && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
@@ -164,63 +167,6 @@
                 nameof(QuestionsController.Details),
                 Questions,
                 new { id = model.RedirectInfo.QuestionId, model.RedirectInfo.Page });
-        }
-
-        [Authorize(Roles = CommonConstants.ModeratorRole)]
-        public ActionResult Delete(int? id, int? questionId, int? page)
-        {
-            if (id == null || questionId == null)
-            {
-                return BadRequest();
-            }
-
-            if (page == null || page < 1)
-            {
-                page = 1;
-            }
-
-            QuestionRedirectServiceModel model = new QuestionRedirectServiceModel
-            {
-                Page = page,
-                QuestionId = questionId
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = CommonConstants.ModeratorRole)]
-        [ValidateAntiForgeryToken]
-        [ActionName(nameof(Delete))]
-        [Log(LogType.Delete, Comments)]
-        public ActionResult DeletePost(int? id, QuestionRedirectServiceModel model)
-        {
-            if (id == null || model.QuestionId == null)
-            {
-                return BadRequest();
-            }
-
-            if (model.Page == null || model.Page < 1)
-            {
-                model.Page = 1;
-            }
-
-            bool success = this.commentService.Delete((int)id);
-
-            if (!success)
-            {
-                return BadRequest();
-            }
-
-            TempData.AddSuccessMessage(string.Format(
-                WebConstants.SuccessfullEntityOperation,
-                Comment,
-                WebConstants.Deleted));
-
-            return RedirectToAction(
-                nameof(QuestionsController.Details),
-                Questions,
-                new { id = model.QuestionId, model.Page });
         }
 
         [HttpPost]

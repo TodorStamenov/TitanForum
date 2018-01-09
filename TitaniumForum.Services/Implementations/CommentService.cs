@@ -30,12 +30,16 @@
                 .Where(a => a.Id == answerId)
                 .Select(a => new
                 {
-                    a.IsDeleted
+                    a.IsDeleted,
+                    IsQuestionDeleted = a.Question.IsDeleted,
+                    IsQuestionLocked = a.Question.IsLocked
                 })
                 .FirstOrDefault();
 
             if (answerInfo == null
-                || answerInfo.IsDeleted)
+                || answerInfo.IsDeleted
+                || answerInfo.IsQuestionDeleted
+                || answerInfo.IsQuestionLocked)
             {
                 return false;
             }
@@ -58,28 +62,15 @@
         {
             Comment comment = this.db.Comments.Find(id);
 
-            if (comment == null)
+            if (comment == null
+                || comment.Answer.IsDeleted
+                || comment.Answer.Question.IsDeleted
+                || comment.Answer.Question.IsLocked)
             {
                 return false;
             }
 
             comment.Content = content;
-
-            this.db.Save();
-
-            return true;
-        }
-
-        public bool Delete(int id)
-        {
-            Comment comment = this.db.Comments.Find(id);
-
-            if (comment == null)
-            {
-                return false;
-            }
-
-            comment.IsDeleted = true;
 
             this.db.Save();
 
@@ -125,6 +116,9 @@
                 .Comments
                 .AllEntries()
                 .Where(c => c.Id == id)
+                .Where(c => !c.Answer.IsDeleted)
+                .Where(c => !c.Answer.Question.IsDeleted)
+                .Where(c => !c.Answer.Question.IsLocked)
                 .ProjectTo<CommentFormServiceModel>()
                 .FirstOrDefault();
         }

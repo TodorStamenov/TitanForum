@@ -135,6 +135,7 @@
             if (question == null
                 || question.IsDeleted
                 || question.IsLocked
+                || question.SubCategory.IsDeleted
                 || (question.Title != title
                     && this.TitleExists(title)))
             {
@@ -230,6 +231,9 @@
             return this.db
                 .Questions
                 .Where(q => q.Id == id)
+                .Where(q => !q.IsDeleted)
+                .Where(q => !q.IsLocked)
+                .Where(q => !q.SubCategory.IsDeleted)
                 .Select(q => new QuestionFormServiceModel
                 {
                     Title = q.Title,
@@ -260,6 +264,7 @@
                    DownVotes = q.Votes.Count(v => v.Direction == Direction.Dislike),
                    IsOwner = q.AuthorId == userId,
                    IsLocked = q.IsLocked,
+                   IsReported = q.IsReported,
                    HasVoted = q.Votes.Any(v => v.UserId == userId)
                })
                .FirstOrDefault();

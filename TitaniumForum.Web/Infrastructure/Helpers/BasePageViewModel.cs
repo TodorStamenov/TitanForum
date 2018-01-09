@@ -1,4 +1,6 @@
-﻿namespace TitaniumForum.Web.Infrastructure.Helpers
+﻿using System;
+
+namespace TitaniumForum.Web.Infrastructure.Helpers
 {
     public class BasePageViewModel
     {
@@ -7,7 +9,17 @@
 
         public int CurrentPage { get; set; }
 
-        public int TotalPages { get; set; }
+        public int TotalEntries { get; set; }
+
+        public int EntriesPerPage { get; set; }
+
+        public int TotalPages
+        {
+            get
+            {
+                return (int)Math.Ceiling(this.TotalEntries / (double)this.EntriesPerPage);
+            }
+        }
 
         public int FirstPage
         {

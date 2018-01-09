@@ -1,0 +1,17 @@
+﻿@model IEnumerable<ListQuestionsServiceModel>
+
+@{
+    ViewBag.Title = "Reported Questions";
+}
+
+<br />
+<div class="row">
+    <div class="col-md-3">
+        @Html.Action("Invoke", "Menu", new { area = string.Empty })
+    </div>
+    <div class="col-md-9">
+        <h2>@ViewBag.Title</h2>
+        <br />
+        @Html.Partial("_ListQuestions", Model)
+    </div>
+</div>

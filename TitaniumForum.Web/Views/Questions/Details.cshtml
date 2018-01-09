@@ -33,7 +33,7 @@
             }
             <hr />
             <h3>
-                <a href="@Url.Action("Details", "Questions", new { area = string.Empty, id = Model.Question.Id })">
+                <a href="#">
                     @Model.Question.Title
                 </a>
             </h3>
@@ -119,6 +119,15 @@
                                 @Html.AntiForgeryToken()
                                 @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
                                 <input class="btn btn-default" type="submit" value="Lock" />
+                            }
+                        }
+                        if (Model.Question.IsReported)
+                        {
+                            using (Html.BeginForm("Conceal", "Questions", new { area = WebConstants.ModeratorArea }, FormMethod.Post, new { @class = "pull-left lock-button" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden(nameof(Model.Question.Id), Model.Question.Id)
+                                <input class="btn btn-default" type="submit" value="Conceal" />
                             }
                         }
                         <a class="btn btn-default" href="@Url.Action("Delete", "Questions", new { id = Model.Question.Id, area = WebConstants.ModeratorArea })">
@@ -218,7 +227,7 @@
                         }
                         @if (User.IsInRole(CommonConstants.ModeratorRole))
                         {
-                            <a class="btn btn-default" href="@Url.Action("Delete", "Answers", new { id = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                            <a class="btn btn-default" href="@Url.Action("Delete", "Answers", new { id = answer.Id, questionId = Model.Question.Id, page = Model.CurrentPage, area = WebConstants.ModeratorArea })">
                                 Delete
                             </a>
                         }
@@ -283,7 +292,7 @@
                             }
                             @if (User.IsInRole(CommonConstants.ModeratorRole))
                             {
-                                <a class="btn btn-default" href="@Url.Action("Delete", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage })">
+                                <a class="btn btn-default" href="@Url.Action("Delete", "Comments", new { id = comment.Id, questionId = Model.Question.Id, page = Model.CurrentPage, area = WebConstants.ModeratorArea })">
                                     Delete
                                 </a>
                             }

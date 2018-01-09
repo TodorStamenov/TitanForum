@@ -10,7 +10,7 @@
 
         public bool IsLocked { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public bool IsReported { get; set; }
 
         public bool HasVoted { get; set; }
     }

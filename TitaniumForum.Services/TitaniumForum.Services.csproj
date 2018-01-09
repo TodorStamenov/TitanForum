@@ -63,8 +63,12 @@
     <Compile Include="Areas\Admin\Models\Roles\RoleServiceModel.cs" />
     <Compile Include="Areas\Admin\Models\Users\UserRolesServiceModel.cs" />
     <Compile Include="Areas\Moderator\ICategoryService.cs" />
+    <Compile Include="Areas\Moderator\IModeratorAnswerService.cs" />
+    <Compile Include="Areas\Moderator\IModeratorCommentService.cs" />
     <Compile Include="Areas\Moderator\IModeratorQuestionService.cs" />
     <Compile Include="Areas\Moderator\Implementations\CategoryService.cs" />
+    <Compile Include="Areas\Moderator\Implementations\ModeratorAnswerService.cs" />
+    <Compile Include="Areas\Moderator\Implementations\ModeratorCommentService.cs" />
     <Compile Include="Areas\Moderator\Implementations\ModeratorQuestionService.cs" />
     <Compile Include="Areas\Moderator\Implementations\SubCategoryService.cs" />
     <Compile Include="Areas\Moderator\ISubCategoryService.cs" />
@@ -98,6 +102,7 @@
     <Compile Include="Models\Questions\ListQuestionsServiceModel.cs" />
     <Compile Include="Models\Questions\QuestionDetailsServiceModel.cs" />
     <Compile Include="Models\Questions\QuestionFormServiceModel.cs" />
+    <Compile Include="Models\Questions\QuestionInfoServiceModel.cs" />
     <Compile Include="Models\Questions\QuestionRedirectServiceModel.cs" />
     <Compile Include="Models\SubCategories\MenuSubCategoryServiceModel.cs" />
     <Compile Include="Models\Tags\ListTagsServiceModel.cs" />

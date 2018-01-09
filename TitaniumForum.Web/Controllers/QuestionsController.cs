@@ -4,7 +4,6 @@
     using Data.Models;
     using Infrastructure;
     using Infrastructure.Extensions;
-    using Infrastructure.Filters;
     using Infrastructure.Helpers;
     using Microsoft.AspNet.Identity;
     using Models.Questions;
@@ -96,17 +95,15 @@
 
         public ActionResult Edit(int? id)
         {
-            if (id == null
-                || this.questionService.IsLocked((int)id))
+            if (id == null)
             {
                 return BadRequest();
             }
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool canEdit = this.questionService.CanEdit((int)id, userId);
-
-            if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
+            if (!this.questionService.CanEdit((int)id, userId)
+                && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
@@ -137,9 +134,8 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool canEdit = this.questionService.CanEdit((int)id, userId);
-
-            if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
+            if (!this.questionService.CanEdit((int)id, userId)
+                && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
@@ -258,7 +254,8 @@
             QuestionDetailsViewModel model = new QuestionDetailsViewModel
             {
                 CurrentPage = (int)page,
-                TotalPages = ControllerHelpers.GetTotalPages(totalAnswers, AnswersPerPage),
+                TotalEntries = totalAnswers,
+                EntriesPerPage = AnswersPerPage,
                 Question = this.questionService.Details((int)id, userId),
                 Answers = this.answerService.ByQuestion((int)id, userId, (int)page, AnswersPerPage),
                 Tags = this.tagService.ByQuestion((int)id)
@@ -293,7 +290,8 @@
             ListQuestionsViewModel model = new ListQuestionsViewModel
             {
                 CurrentPage = (int)page,
-                TotalPages = ControllerHelpers.GetTotalPages(totalQuestions, QuestionsPerPage),
+                TotalEntries = totalQuestions,
+                EntriesPerPage = QuestionsPerPage,
                 Search = null,
                 CategoryId = id,
                 SubCategoryId = null,
@@ -325,7 +323,8 @@
             ListQuestionsViewModel model = new ListQuestionsViewModel
             {
                 CurrentPage = (int)page,
-                TotalPages = ControllerHelpers.GetTotalPages(totalQuestions, QuestionsPerPage),
+                TotalEntries = totalQuestions,
+                EntriesPerPage = QuestionsPerPage,
                 Search = null,
                 CategoryId = null,
                 SubCategoryId = id,
@@ -355,7 +354,8 @@
             ListQuestionsViewModel model = new ListQuestionsViewModel
             {
                 CurrentPage = (int)page,
-                TotalPages = ControllerHelpers.GetTotalPages(totalQuestions, QuestionsPerPage),
+                TotalEntries = totalQuestions,
+                EntriesPerPage = QuestionsPerPage,
                 Search = null,
                 CategoryId = null,
                 SubCategoryId = null,
@@ -379,7 +379,8 @@
             ListQuestionsViewModel model = new ListQuestionsViewModel
             {
                 CurrentPage = (int)page,
-                TotalPages = ControllerHelpers.GetTotalPages(totalQuestions, QuestionsPerPage),
+                TotalEntries = totalQuestions,
+                EntriesPerPage = QuestionsPerPage,
                 Search = search,
                 CategoryId = null,
                 SubCategoryId = null,

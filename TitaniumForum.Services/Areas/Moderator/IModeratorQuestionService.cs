@@ -5,6 +5,8 @@
 
     public interface IModeratorQuestionService
     {
+        int DeletedCount(string search);
+
         bool Delete(int id);
 
         bool Restore(int id);
@@ -15,9 +17,7 @@
 
         bool Conceal(int id);
 
-        IEnumerable<ListQuestionsServiceModel> Reported(int page, int pageSize);
-
-        IEnumerable<ListQuestionsServiceModel> Locked(int page, int pageSize, string search);
+        IEnumerable<ListQuestionsServiceModel> Reported(int questionsCount);
 
         IEnumerable<ListQuestionsServiceModel> Deleted(int page, int pageSize, string search);
     }

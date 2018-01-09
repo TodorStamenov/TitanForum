@@ -73,34 +73,14 @@
             Answer answer = this.db.Answers.Find(id);
 
             if (answer == null
-                || answer.IsDeleted)
+                || answer.IsDeleted
+                || answer.Question.IsDeleted
+                || answer.Question.IsLocked)
             {
                 return false;
             }
 
             answer.Content = content;
-
-            this.db.Save();
-
-            return true;
-        }
-
-        public bool Delete(int id)
-        {
-            Answer answer = this.db.Answers.Find(id);
-
-            if (answer == null
-                || answer.IsDeleted)
-            {
-                return false;
-            }
-
-            answer.IsDeleted = true;
-
-            foreach (var comment in answer.Comments)
-            {
-                comment.IsDeleted = true;
-            }
 
             this.db.Save();
 
@@ -113,6 +93,8 @@
 
             if (answer == null
                 || answer.IsDeleted
+                || answer.Question.IsDeleted
+                || answer.Question.IsLocked
                 || answer.Votes.Any(v => v.UserId == userId))
             {
                 return false;
@@ -146,6 +128,8 @@
                 .Answers
                 .AllEntries()
                 .Where(a => a.Id == id)
+                .Where(a => !a.Question.IsDeleted)
+                .Where(a => !a.Question.IsLocked)
                 .ProjectTo<AnswerFormServiceModel>()
                 .FirstOrDefault();
         }
