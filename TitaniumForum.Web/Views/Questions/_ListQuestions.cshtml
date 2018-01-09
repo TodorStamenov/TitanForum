@@ -13,7 +13,7 @@
             <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
             @question.DateAdded.ToShortDateString()
             <span class="glyphicon glyphicon-folder-open site-glyphicon"></span>
-            <a href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = question.SubCategoryId })">@question.SubCategoryName</a>
+            <a href="@Url.Action("Index", "Questions", new { area = string.Empty, subCategoryId = question.SubCategoryId })">@question.SubCategoryName</a>
             <hr />
             <span class="glyphicon glyphicon-hand-up text-success site-glyphicon"></span>
             @question.UpVotes

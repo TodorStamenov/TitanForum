@@ -16,13 +16,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Titanium Forum", "All", "Questions", new { area = string.Empty }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Titanium Forum", "Index", "Questions", new { area = string.Empty }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="@Url.Action("Ranking", "Users", new { area = string.Empty })">Ranking</a></li>
                     <li>
-                        @using (Html.BeginForm("All", "Questions", new { area = string.Empty }, FormMethod.Get, new { @class = "form-inline search-form" }))
+                        @using (Html.BeginForm("Index", "Questions", new { area = string.Empty }, FormMethod.Get, new { @class = "form-inline search-form" }))
                         {
                             <input class="form-control" type="text" name="search" placeholder="Search...">
                             <button class="btn btn-success" type="submit">Search</button>

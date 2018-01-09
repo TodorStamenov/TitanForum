@@ -102,7 +102,7 @@
                 {
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    return RedirectToAction("All", "Questions");
+                    return RedirectToAction("Index", "Questions");
                 }
                 AddErrors(result);
             }
@@ -117,7 +117,7 @@
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("All", "Questions");
+            return RedirectToAction("Index", "Questions");
         }
 
         protected override void Dispose(bool disposing)
@@ -164,7 +164,7 @@
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("All", "Questions");
+            return RedirectToAction("Index", "Questions");
         }
 
         internal class ChallengeResult : HttpUnauthorizedResult

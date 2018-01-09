@@ -4,11 +4,9 @@
     using Data.Models;
     using Infrastructure;
     using Infrastructure.Extensions;
-    using Infrastructure.Filters;
     using Microsoft.AspNet.Identity;
     using Services;
     using Services.Models.Comments;
-    using Services.Models.Questions;
     using System;
     using System.Web.Mvc;
 

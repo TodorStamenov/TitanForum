@@ -4,7 +4,6 @@
     using Data.Models;
     using Infrastructure;
     using Infrastructure.Extensions;
-    using Infrastructure.Helpers;
     using Microsoft.AspNet.Identity;
     using Models.Questions;
     using Services;
@@ -239,7 +238,7 @@
         {
             if (id == null)
             {
-                return BadRequest();
+                return HttpNotFound();
             }
 
             if (page == null || page < 1)
@@ -263,130 +262,57 @@
 
             if (model.Question == null)
             {
-                return BadRequest();
+                return HttpNotFound();
             }
 
             return View(model);
         }
 
         [AllowAnonymous]
-        public ActionResult ByCategory(int? id, int? page)
-        {
-            if (id == null
-                || !this.categoryService.Exists((int)id)
-                || this.categoryService.IsDeleted((int)id)
-                || !this.categoryService.HasQuestions((int)id))
-            {
-                return RedirectToAction(nameof(All));
-            }
-
-            if (page == null || page < 1)
-            {
-                page = 1;
-            }
-
-            int totalQuestions = this.questionService.TotalByCategory((int)id);
-
-            ListQuestionsViewModel model = new ListQuestionsViewModel
-            {
-                CurrentPage = (int)page,
-                TotalEntries = totalQuestions,
-                EntriesPerPage = QuestionsPerPage,
-                Search = null,
-                CategoryId = id,
-                SubCategoryId = null,
-                TagId = null,
-                Questions = this.questionService.ByCategory((int)page, QuestionsPerPage, (int)id)
-            };
-
-            return View(model);
-        }
-
-        [AllowAnonymous]
-        public ActionResult BySubCategory(int? id, int? page)
-        {
-            if (id == null
-                || !this.subCategoryService.Exists((int)id)
-                || this.subCategoryService.IsDeleted((int)id)
-                || !this.subCategoryService.HasQuestions((int)id))
-            {
-                return RedirectToAction(nameof(All));
-            }
-
-            if (page == null || page < 1)
-            {
-                page = 1;
-            }
-
-            int totalQuestions = this.questionService.TotalBySubCategory((int)id);
-
-            ListQuestionsViewModel model = new ListQuestionsViewModel
-            {
-                CurrentPage = (int)page,
-                TotalEntries = totalQuestions,
-                EntriesPerPage = QuestionsPerPage,
-                Search = null,
-                CategoryId = null,
-                SubCategoryId = id,
-                TagId = null,
-                Questions = this.questionService.BySubCategory((int)page, QuestionsPerPage, (int)id)
-            };
-
-            return View(model);
-        }
-
-        [AllowAnonymous]
-        public ActionResult ByTag(int? id, int? page)
-        {
-            if (id == null
-               || !this.tagService.Exists((int)id))
-            {
-                return RedirectToAction(nameof(All));
-            }
-
-            if (page == null || page < 1)
-            {
-                page = 1;
-            }
-
-            int totalQuestions = this.questionService.TotalByTag((int)id);
-
-            ListQuestionsViewModel model = new ListQuestionsViewModel
-            {
-                CurrentPage = (int)page,
-                TotalEntries = totalQuestions,
-                EntriesPerPage = QuestionsPerPage,
-                Search = null,
-                CategoryId = null,
-                SubCategoryId = null,
-                TagId = (int)id,
-                Questions = this.questionService.ByTag((int)page, QuestionsPerPage, (int)id)
-            };
-
-            return View(model);
-        }
-
-        [AllowAnonymous]
-        public ActionResult All(int? page, string search)
+        public ActionResult Index(int? page, string search, int? tagId, int? categoryId, int? subCategoryId)
         {
             if (page == null || page < 1)
             {
                 page = 1;
             }
 
-            int totalQuestions = this.questionService.Total(search);
-
             ListQuestionsViewModel model = new ListQuestionsViewModel
             {
                 CurrentPage = (int)page,
-                TotalEntries = totalQuestions,
-                EntriesPerPage = QuestionsPerPage,
-                Search = search,
-                CategoryId = null,
-                SubCategoryId = null,
-                TagId = null,
-                Questions = this.questionService.All((int)page, QuestionsPerPage, search)
+                EntriesPerPage = QuestionsPerPage
             };
+
+            if (categoryId != null
+                && this.categoryService.Exists((int)categoryId)
+                && !this.categoryService.IsDeleted((int)categoryId)
+                && this.categoryService.HasQuestions((int)categoryId))
+            {
+                model.CategoryId = categoryId;
+                model.TotalEntries = this.questionService.TotalByCategory((int)categoryId);
+                model.Questions = this.questionService.ByCategory((int)page, QuestionsPerPage, (int)categoryId);
+            }
+            else if (subCategoryId != null
+                && this.subCategoryService.Exists((int)subCategoryId)
+                && !this.subCategoryService.IsDeleted((int)subCategoryId)
+                && this.subCategoryService.HasQuestions((int)subCategoryId))
+            {
+                model.SubCategoryId = subCategoryId;
+                model.TotalEntries = this.questionService.TotalBySubCategory((int)subCategoryId);
+                model.Questions = this.questionService.BySubCategory((int)page, QuestionsPerPage, (int)subCategoryId);
+            }
+            else if (tagId != null
+                && this.tagService.Exists((int)tagId))
+            {
+                model.TagId = tagId;
+                model.TotalEntries = this.questionService.TotalByTag((int)tagId);
+                model.Questions = this.questionService.ByTag((int)page, QuestionsPerPage, (int)tagId);
+            }
+            else
+            {
+                model.TotalEntries = this.questionService.Total(search);
+                model.Search = search;
+                model.Questions = this.questionService.All((int)page, QuestionsPerPage, search);
+            }
 
             return View(model);
         }

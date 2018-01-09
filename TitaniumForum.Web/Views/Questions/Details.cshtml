@@ -42,7 +42,7 @@
             Tags:
             @foreach (var tag in Model.Tags)
             {
-                <a class="btn btn-default" href="@Url.Action("ByTag", "Questions", new { area = string.Empty, id = tag.Id })">
+                <a class="btn btn-default" href="@Url.Action("Index", "Questions", new { area = string.Empty, tagId = tag.Id })">
                     @tag.Name
                 </a>
             }
@@ -82,7 +82,7 @@
             <span class="glyphicon glyphicon-calendar site-glyphicon"></span>
             @Model.Question.DateAdded
             <span class="glyphicon glyphicon-folder-open site-glyphicon"></span>
-            <a href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = Model.Question.SubCategoryId })">
+            <a href="@Url.Action("Index", "Questions", new { area = string.Empty, subCategoryId = Model.Question.SubCategoryId })">
                 @Model.Question.SubCategoryName
             </a>
             @if (User.Identity.IsAuthenticated && (!Model.Question.IsLocked || User.IsInRole(CommonConstants.ModeratorRole)))

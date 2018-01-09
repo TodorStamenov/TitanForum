@@ -6,13 +6,13 @@
         if (ViewBag.CategoryId == category.Id)
         {
             <li role="presentation" class="active">
-                <a href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, id = category.Id })">@category.Name</a>
+                <a href="@Url.Action("Index", "Questions", new { area = string.Empty, categoryId = category.Id })">@category.Name</a>
             </li>
         }
         else
         {
             <li role="presentation">
-                <a href="@Url.Action("ByCategory", "Questions", new { area = string.Empty, id = category.Id })">@category.Name</a>
+                <a href="@Url.Action("Index", "Questions", new { area = string.Empty, categoryId = category.Id })">@category.Name</a>
             </li>
         }
 
@@ -21,13 +21,13 @@
             if (ViewBag.SubCategoryId == subCategory.Id)
             {
                 <li role="presentation" class="active">
-                    <a class="col-md-offset-2" href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = subCategory.Id })">@subCategory.Name</a>
+                    <a class="col-md-offset-2" href="@Url.Action("Index", "Questions", new { area = string.Empty, subCategoryId = subCategory.Id })">@subCategory.Name</a>
                 </li>
             }
             else
             {
                 <li role="presentation">
-                    <a class="col-md-offset-2" href="@Url.Action("BySubCategory", "Questions", new { area = string.Empty, id = subCategory.Id })">@subCategory.Name</a>
+                    <a class="col-md-offset-2" href="@Url.Action("Index", "Questions", new { area = string.Empty, subCategoryId = subCategory.Id })">@subCategory.Name</a>
                 </li>
             }
         }

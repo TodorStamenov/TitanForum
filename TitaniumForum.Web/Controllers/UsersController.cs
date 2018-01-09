@@ -1,6 +1,5 @@
 ﻿namespace TitaniumForum.Web.Controllers
 {
-    using Infrastructure.Helpers;
     using Models.Users;
     using Services;
     using System.Web.Mvc;

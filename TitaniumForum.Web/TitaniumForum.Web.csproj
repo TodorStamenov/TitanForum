@@ -343,15 +343,11 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Shared\_CategoryMenu.cshtml" />
-    <Content Include="Views\Questions\All.cshtml" />
-    <Content Include="Views\Questions\ByCategory.cshtml" />
-    <Content Include="Views\Questions\BySubCategory.cshtml" />
     <Content Include="Views\Questions\_ListQuestions.cshtml" />
     <Content Include="Views\Users\Ranking.cshtml" />
     <Content Include="Views\Questions\Create.cshtml" />
     <Content Include="Views\Questions\Details.cshtml" />
     <Content Include="Views\Questions\_QuestionForm.cshtml" />
-    <Content Include="Views\Questions\ByTag.cshtml" />
     <Content Include="Views\Questions\Edit.cshtml" />
     <Content Include="Areas\Moderator\Views\Questions\Delete.cshtml" />
     <Content Include="Views\Answers\Create.cshtml" />
@@ -362,6 +358,7 @@
     <Content Include="Views\Comments\Edit.cshtml" />
     <Content Include="Areas\Moderator\Views\Comments\Delete.cshtml" />
     <Content Include="Views\Comments\_CommentForm.cshtml" />
+    <Content Include="Views\Questions\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
