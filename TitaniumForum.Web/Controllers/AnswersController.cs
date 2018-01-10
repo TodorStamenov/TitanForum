@@ -29,7 +29,7 @@
         public ActionResult Create(int? questionId, int? page)
         {
             if (questionId == null
-                || this.questionService.IsLocked((int)questionId))
+                || this.questionService.IsLocked(questionId.Value))
             {
                 return BadRequest();
             }
@@ -69,7 +69,7 @@
             int authorId = User.Identity.GetUserId<int>();
 
             bool success = this.answerService.Create(
-                (int)model.RedirectInfo.QuestionId,
+                model.RedirectInfo.QuestionId.Value,
                 authorId,
                 model.Content);
 
@@ -104,14 +104,14 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool canEdit = this.answerService.CanEdit((int)id, userId);
+            bool canEdit = this.answerService.CanEdit(id.Value, userId);
 
             if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
 
-            AnswerFormServiceModel model = this.answerService.GetForm((int)id);
+            AnswerFormServiceModel model = this.answerService.GetForm(id.Value);
 
             if (model == null)
             {
@@ -146,14 +146,14 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool canEdit = this.answerService.CanEdit((int)id, userId);
+            bool canEdit = this.answerService.CanEdit(id.Value, userId);
 
             if (!canEdit && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
 
-            bool success = this.answerService.Edit((int)id, model.Content);
+            bool success = this.answerService.Edit(id.Value, model.Content);
 
             if (!success)
             {
@@ -196,7 +196,7 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool success = this.answerService.Vote((int)answerId, userId, voteDirection);
+            bool success = this.answerService.Vote(answerId.Value, userId, voteDirection);
 
             if (!success)
             {

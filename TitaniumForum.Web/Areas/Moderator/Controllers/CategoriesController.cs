@@ -59,9 +59,14 @@
             return RedirectToAction(nameof(All));
         }
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
-            CategoryFormServiceModel model = this.categoryServive.GetForm(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            CategoryFormServiceModel model = this.categoryServive.GetForm(id.Value);
 
             if (model == null)
             {
@@ -74,14 +79,19 @@
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Log(LogType.Edit, Categories)]
-        public ActionResult Edit(int id, CategoryFormServiceModel model)
+        public ActionResult Edit(int? id, CategoryFormServiceModel model)
         {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            string oldName = this.categoryServive.GetName(id);
+            string oldName = this.categoryServive.GetName(id.Value);
 
             if (oldName == null)
             {
@@ -97,7 +107,7 @@
                 return View(model);
             }
 
-            bool success = this.categoryServive.Edit(id, newName);
+            bool success = this.categoryServive.Edit(id.Value, newName);
 
             if (!success)
             {
@@ -112,8 +122,13 @@
             return RedirectToAction(nameof(All));
         }
 
-        public ActionResult Delete(int id)
+        public ActionResult Delete(int? id)
         {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
             return View();
         }
 
@@ -121,9 +136,14 @@
         [ActionName(nameof(Delete))]
         [ValidateAntiForgeryToken]
         [Log(LogType.Delete, Categories)]
-        public ActionResult DeletePost(int id)
+        public ActionResult DeletePost(int? id)
         {
-            bool success = this.categoryServive.Delete(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            bool success = this.categoryServive.Delete(id.Value);
 
             if (!success)
             {
@@ -141,9 +161,14 @@
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Log(LogType.Restore, Categories)]
-        public ActionResult Restore(int id)
+        public ActionResult Restore(int? id)
         {
-            bool success = this.categoryServive.Restore(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            bool success = this.categoryServive.Restore(id.Value);
 
             if (!success)
             {

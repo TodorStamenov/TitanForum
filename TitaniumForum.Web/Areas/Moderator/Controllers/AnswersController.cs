@@ -60,7 +60,7 @@
                 model.Page = 1;
             }
 
-            bool success = this.answerService.Delete((int)id);
+            bool success = this.answerService.Delete(id.Value);
 
             if (!success)
             {
@@ -88,7 +88,7 @@
                 return BadRequest();
             }
 
-            bool success = this.answerService.Restore((int)id);
+            bool success = this.answerService.Restore(id.Value);
 
             if (!success)
             {
@@ -117,11 +117,11 @@
 
             ListAnswersModeratorViewModel model = new ListAnswersModeratorViewModel
             {
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 Search = search,
                 TotalEntries = questionsCount,
                 EntriesPerPage = AnswersPerPage,
-                Answers = this.answerService.Deleted((int)page, AnswersPerPage, search)
+                Answers = this.answerService.Deleted(page.Value, AnswersPerPage, search)
             };
 
             return View(model);

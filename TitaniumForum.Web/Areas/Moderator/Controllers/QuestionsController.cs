@@ -36,7 +36,7 @@
                 return BadRequest();
             }
 
-            bool success = this.questionService.Lock((int)id);
+            bool success = this.questionService.Lock(id.Value);
 
             if (!success)
             {
@@ -64,7 +64,7 @@
                 return BadRequest();
             }
 
-            bool success = this.questionService.Unlock((int)id);
+            bool success = this.questionService.Unlock(id.Value);
 
             if (!success)
             {
@@ -92,7 +92,7 @@
                 return BadRequest();
             }
 
-            bool success = this.questionService.Conceal((int)id);
+            bool success = this.questionService.Conceal(id.Value);
 
             if (!success)
             {
@@ -131,7 +131,7 @@
                 return BadRequest();
             }
 
-            bool success = this.questionService.Delete((int)id);
+            bool success = this.questionService.Delete(id.Value);
 
             if (!success)
             {
@@ -159,7 +159,7 @@
                 return BadRequest();
             }
 
-            bool success = this.questionService.Restore((int)id);
+            bool success = this.questionService.Restore(id.Value);
 
             if (!success)
             {
@@ -196,11 +196,11 @@
 
             ListQuestionsModeratorViewModel model = new ListQuestionsModeratorViewModel
             {
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 Search = search,
                 TotalEntries = questionsCount,
                 EntriesPerPage = QuestionsPerPage,
-                Questions = this.questionService.Deleted((int)page, QuestionsPerPage, search)
+                Questions = this.questionService.Deleted(page.Value, QuestionsPerPage, search)
             };
 
             return View(model);

@@ -30,7 +30,7 @@
         {
             if (answerId == null
                 || questionId == null
-                || this.questionService.IsLocked((int)questionId))
+                || this.questionService.IsLocked(questionId.Value))
             {
                 return BadRequest();
             }
@@ -41,7 +41,7 @@
             }
 
             CommentFormServiceModel model = new CommentFormServiceModel();
-            model.AnswerId = (int)answerId;
+            model.AnswerId = answerId.Value;
             model.RedirectInfo.Page = page;
             model.RedirectInfo.QuestionId = questionId;
 
@@ -102,13 +102,13 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            if (!this.commentService.CanEdit((int)id, userId)
+            if (!this.commentService.CanEdit(id.Value, userId)
                 && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
 
-            CommentFormServiceModel model = this.commentService.GetForm((int)id);
+            CommentFormServiceModel model = this.commentService.GetForm(id.Value);
 
             if (model == null)
             {
@@ -143,13 +143,13 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            if (!this.commentService.CanEdit((int)id, userId)
+            if (!this.commentService.CanEdit(id.Value, userId)
                 && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
 
-            bool success = this.commentService.Edit((int)id, model.Content);
+            bool success = this.commentService.Edit(id.Value, model.Content);
 
             if (!success)
             {
@@ -192,7 +192,7 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool success = this.commentService.Vote((int)commentId, userId, voteDirection);
+            bool success = this.commentService.Vote(commentId.Value, userId, voteDirection);
 
             if (!success)
             {

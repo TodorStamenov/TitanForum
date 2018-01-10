@@ -17,7 +17,10 @@
         private ApplicationUserManager userManager;
         private IAuthenticationManager authManager;
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, IAuthenticationManager authManager)
+        public AccountController(
+            ApplicationUserManager userManager,
+            ApplicationSignInManager signInManager,
+            IAuthenticationManager authManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;

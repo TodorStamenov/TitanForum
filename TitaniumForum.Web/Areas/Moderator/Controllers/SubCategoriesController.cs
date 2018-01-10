@@ -73,11 +73,16 @@
                 new { area = WebConstants.ModeratorArea });
         }
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
             SubCategoryFormViewModel model = new SubCategoryFormViewModel
             {
-                SubCategory = this.subCategoryService.GetForm(id),
+                SubCategory = this.subCategoryService.GetForm(id.Value),
                 Categories = this.GetCategories()
             };
 
@@ -92,15 +97,20 @@
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Log(LogType.Edit, SubCategories)]
-        public ActionResult Edit(int id, SubCategoryFormViewModel model)
+        public ActionResult Edit(int? id, SubCategoryFormViewModel model)
         {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
             if (!ModelState.IsValid)
             {
                 model.Categories = this.GetCategories();
                 return View(model);
             }
 
-            string oldName = this.subCategoryService.GetName(id);
+            string oldName = this.subCategoryService.GetName(id.Value);
 
             if (oldName == null)
             {
@@ -117,7 +127,7 @@
                 return View(model);
             }
 
-            bool success = this.subCategoryService.Edit(id, model.CategoryId, newName);
+            bool success = this.subCategoryService.Edit(id.Value, model.CategoryId, newName);
 
             if (!success)
             {
@@ -135,8 +145,13 @@
                 new { area = WebConstants.ModeratorArea });
         }
 
-        public ActionResult Delete(int id)
+        public ActionResult Delete(int? id)
         {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
             return View();
         }
 
@@ -144,9 +159,14 @@
         [ActionName(nameof(Delete))]
         [ValidateAntiForgeryToken]
         [Log(LogType.Delete, SubCategories)]
-        public ActionResult DeletePost(int id)
+        public ActionResult DeletePost(int? id)
         {
-            bool success = this.subCategoryService.Delete(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            bool success = this.subCategoryService.Delete(id.Value);
 
             if (!success)
             {
@@ -167,9 +187,14 @@
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Log(LogType.Restore, SubCategories)]
-        public ActionResult Restore(int id)
+        public ActionResult Restore(int? id)
         {
-            bool success = this.subCategoryService.Restore(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            bool success = this.subCategoryService.Restore(id.Value);
 
             if (!success)
             {

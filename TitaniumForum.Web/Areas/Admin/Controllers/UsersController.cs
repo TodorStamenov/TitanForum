@@ -30,9 +30,14 @@
             this.userManager = userManager;
         }
 
-        public async Task<ActionResult> EditRoles(int id)
+        public async Task<ActionResult> EditRoles(int? id)
         {
-            User user = await userManager.FindByIdAsync(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            User user = await userManager.FindByIdAsync(id.Value);
 
             if (user == null)
             {
@@ -41,8 +46,8 @@
 
             UserRoleEditViewModel model = new UserRoleEditViewModel
             {
-                IsUserLocked = await userManager.IsLockedOutAsync(id),
-                User = this.userService.Roles(id),
+                IsUserLocked = await userManager.IsLockedOutAsync(id.Value),
+                User = this.userService.Roles(id.Value),
                 Roles = this.userService.AllRoles()
             };
 
@@ -51,16 +56,21 @@
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddRole(int userId, string roleName)
+        public ActionResult AddRole(int? userId, string roleName)
         {
-            string username = this.userService.GetUsername(userId);
+            if (userId == null)
+            {
+                return BadRequest();
+            }
+
+            string username = this.userService.GetUsername(userId.Value);
 
             if (username == null)
             {
                 return BadRequest();
             }
 
-            bool success = this.userService.AddToRole(userId, roleName);
+            bool success = this.userService.AddToRole(userId.Value, roleName);
 
             if (!success)
             {
@@ -74,16 +84,21 @@
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult RemoveRole(int userId, string roleName)
+        public ActionResult RemoveRole(int? userId, string roleName)
         {
-            string username = this.userService.GetUsername(userId);
+            if (userId == null)
+            {
+                return BadRequest();
+            }
+
+            string username = this.userService.GetUsername(userId.Value);
 
             if (username == null)
             {
                 return BadRequest();
             }
 
-            bool success = this.userService.RemoveFromRole(userId, roleName);
+            bool success = this.userService.RemoveFromRole(userId.Value, roleName);
 
             if (!success)
             {
@@ -98,22 +113,27 @@
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Log(LogType.Lock, UsersTable)]
-        public async Task<ActionResult> Lock(int userId)
+        public async Task<ActionResult> Lock(int? userId)
         {
-            User user = await this.userManager.FindByIdAsync(userId);
+            if (userId == null)
+            {
+                return BadRequest();
+            }
+
+            User user = await this.userManager.FindByIdAsync(userId.Value);
 
             if (user == null)
             {
                 return BadRequest();
             }
 
-            if (await this.userManager.IsLockedOutAsync(userId))
+            if (await this.userManager.IsLockedOutAsync(userId.Value))
             {
                 return BadRequest();
             }
 
-            await userManager.SetLockoutEnabledAsync(userId, true);
-            await userManager.SetLockoutEndDateAsync(userId, DateTime.UtcNow.AddYears(10));
+            await userManager.SetLockoutEnabledAsync(userId.Value, true);
+            await userManager.SetLockoutEndDateAsync(userId.Value, DateTime.UtcNow.AddYears(10));
 
             TempData.AddSuccessMessage(string.Format(WebConstants.UserLocked, user.UserName));
 
@@ -123,21 +143,26 @@
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Log(LogType.Unlock, UsersTable)]
-        public async Task<ActionResult> Unlock(int userId)
+        public async Task<ActionResult> Unlock(int? userId)
         {
-            User user = await this.userManager.FindByIdAsync(userId);
+            if (userId == null)
+            {
+                return BadRequest();
+            }
+
+            User user = await this.userManager.FindByIdAsync(userId.Value);
 
             if (user == null)
             {
                 return BadRequest();
             }
 
-            if (!await this.userManager.IsLockedOutAsync(userId))
+            if (!await this.userManager.IsLockedOutAsync(userId.Value))
             {
                 return BadRequest();
             }
 
-            await userManager.SetLockoutEnabledAsync(userId, false);
+            await userManager.SetLockoutEnabledAsync(userId.Value, false);
 
             TempData.AddSuccessMessage(string.Format(WebConstants.UserUnlocked, user.UserName));
 
@@ -158,10 +183,10 @@
             ListLogsViewModel model = new ListLogsViewModel
             {
                 Search = search,
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 TotalEntries = totalLogs,
                 EntriesPerPage = LogsPerPage,
-                Logs = this.userService.Logs((int)page, LogsPerPage, search),
+                Logs = this.userService.Logs(page.Value, LogsPerPage, search),
             };
 
             return View(model);
@@ -179,11 +204,11 @@
             ListUsersViewModel model = new ListUsersViewModel
             {
                 Search = search,
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 UserRole = userRole,
                 TotalEntries = totalUsers,
                 EntriesPerPage = UsersPerPage,
-                Users = this.userService.All((int)page, userRole, search, UsersPerPage),
+                Users = this.userService.All(page.Value, userRole, search, UsersPerPage),
                 Roles = this.userService.AllRoles(),
             };
 

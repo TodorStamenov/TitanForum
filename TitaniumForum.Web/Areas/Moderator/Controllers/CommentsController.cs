@@ -60,7 +60,7 @@
                 model.Page = 1;
             }
 
-            bool success = this.commentService.Delete((int)id);
+            bool success = this.commentService.Delete(id.Value);
 
             if (!success)
             {
@@ -88,7 +88,7 @@
                 return BadRequest();
             }
 
-            bool success = this.commentService.Restore((int)id);
+            bool success = this.commentService.Restore(id.Value);
 
             if (!success)
             {
@@ -117,11 +117,11 @@
 
             ListCommetnsModeratorViewModel model = new ListCommetnsModeratorViewModel
             {
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 Search = search,
                 TotalEntries = questionsCount,
                 EntriesPerPage = CommentsPerPage,
-                Comments = this.commentService.Deleted((int)page, CommentsPerPage, search)
+                Comments = this.commentService.Deleted(page.Value, CommentsPerPage, search)
             };
 
             return View(model);

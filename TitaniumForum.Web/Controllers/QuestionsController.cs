@@ -101,7 +101,7 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            if (!this.questionService.CanEdit((int)id, userId)
+            if (!this.questionService.CanEdit(id.Value, userId)
                 && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
@@ -109,7 +109,7 @@
 
             QuestionFormViewModel model = new QuestionFormViewModel
             {
-                Question = this.questionService.GetForm((int)id),
+                Question = this.questionService.GetForm(id.Value),
                 SubCategories = this.GetSubCategories()
             };
 
@@ -133,13 +133,13 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            if (!this.questionService.CanEdit((int)id, userId)
+            if (!this.questionService.CanEdit(id.Value, userId)
                 && !User.IsInRole(CommonConstants.ModeratorRole))
             {
                 return new HttpUnauthorizedResult();
             }
 
-            string oldTitle = this.questionService.GetTitle((int)id);
+            string oldTitle = this.questionService.GetTitle(id.Value);
 
             if (oldTitle == null)
             {
@@ -157,7 +157,7 @@
             }
 
             bool success = this.questionService.Edit(
-                (int)id,
+                id.Value,
                 newTitle,
                 model.Question.Content,
                 model.Question.Tags,
@@ -185,7 +185,7 @@
                 return BadRequest();
             }
 
-            bool success = this.questionService.Report((int)id);
+            bool success = this.questionService.Report(id.Value);
 
             if (!success)
             {
@@ -223,7 +223,7 @@
 
             int userId = User.Identity.GetUserId<int>();
 
-            bool success = this.questionService.Vote((int)id, userId, voteDirection);
+            bool success = this.questionService.Vote(id.Value, userId, voteDirection);
 
             if (!success)
             {
@@ -246,18 +246,18 @@
                 page = 1;
             }
 
-            int totalAnswers = this.answerService.TotalByQuestion((int)id);
+            int totalAnswers = this.answerService.TotalByQuestion(id.Value);
 
             int userId = User.Identity.GetUserId<int>();
 
             QuestionDetailsViewModel model = new QuestionDetailsViewModel
             {
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 TotalEntries = totalAnswers,
                 EntriesPerPage = AnswersPerPage,
-                Question = this.questionService.Details((int)id, userId),
-                Answers = this.answerService.ByQuestion((int)id, userId, (int)page, AnswersPerPage),
-                Tags = this.tagService.ByQuestion((int)id)
+                Question = this.questionService.Details(id.Value, userId),
+                Answers = this.answerService.ByQuestion(id.Value, userId, page.Value, AnswersPerPage),
+                Tags = this.tagService.ByQuestion(id.Value)
             };
 
             if (model.Question == null)
@@ -278,40 +278,40 @@
 
             ListQuestionsViewModel model = new ListQuestionsViewModel
             {
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 EntriesPerPage = QuestionsPerPage
             };
 
             if (categoryId != null
-                && this.categoryService.Exists((int)categoryId)
-                && !this.categoryService.IsDeleted((int)categoryId)
-                && this.categoryService.HasQuestions((int)categoryId))
+                && this.categoryService.Exists(categoryId.Value)
+                && !this.categoryService.IsDeleted(categoryId.Value)
+                && this.categoryService.HasQuestions(categoryId.Value))
             {
                 model.CategoryId = categoryId;
-                model.TotalEntries = this.questionService.TotalByCategory((int)categoryId);
-                model.Questions = this.questionService.ByCategory((int)page, QuestionsPerPage, (int)categoryId);
+                model.TotalEntries = this.questionService.TotalByCategory(categoryId.Value);
+                model.Questions = this.questionService.ByCategory(page.Value, QuestionsPerPage, categoryId.Value);
             }
             else if (subCategoryId != null
-                && this.subCategoryService.Exists((int)subCategoryId)
-                && !this.subCategoryService.IsDeleted((int)subCategoryId)
-                && this.subCategoryService.HasQuestions((int)subCategoryId))
+                && this.subCategoryService.Exists(subCategoryId.Value)
+                && !this.subCategoryService.IsDeleted(subCategoryId.Value)
+                && this.subCategoryService.HasQuestions(subCategoryId.Value))
             {
                 model.SubCategoryId = subCategoryId;
-                model.TotalEntries = this.questionService.TotalBySubCategory((int)subCategoryId);
-                model.Questions = this.questionService.BySubCategory((int)page, QuestionsPerPage, (int)subCategoryId);
+                model.TotalEntries = this.questionService.TotalBySubCategory(subCategoryId.Value);
+                model.Questions = this.questionService.BySubCategory(page.Value, QuestionsPerPage, subCategoryId.Value);
             }
             else if (tagId != null
-                && this.tagService.Exists((int)tagId))
+                && this.tagService.Exists(tagId.Value))
             {
                 model.TagId = tagId;
-                model.TotalEntries = this.questionService.TotalByTag((int)tagId);
-                model.Questions = this.questionService.ByTag((int)page, QuestionsPerPage, (int)tagId);
+                model.TotalEntries = this.questionService.TotalByTag(tagId.Value);
+                model.Questions = this.questionService.ByTag(page.Value, QuestionsPerPage, tagId.Value);
             }
             else
             {
                 model.TotalEntries = this.questionService.Total(search);
                 model.Search = search;
-                model.Questions = this.questionService.All((int)page, QuestionsPerPage, search);
+                model.Questions = this.questionService.All(page.Value, QuestionsPerPage, search);
             }
 
             return View(model);

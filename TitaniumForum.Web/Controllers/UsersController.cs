@@ -26,10 +26,10 @@
 
             ListUserRankingViewModel model = new ListUserRankingViewModel
             {
-                CurrentPage = (int)page,
+                CurrentPage = page.Value,
                 TotalEntries = totalUsers,
                 EntriesPerPage = UsersPerPage,
-                Users = this.userService.Ranking((int)page, UsersPerPage)
+                Users = this.userService.Ranking(page.Value, UsersPerPage)
             };
 
             return View(model);
