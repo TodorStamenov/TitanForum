@@ -13,7 +13,7 @@
             IEnumerable<Type> allTypes = AppDomain
                 .CurrentDomain
                 .GetAssemblies()
-                .Where(a => a.GetName().Name.Contains("StarStuff"))
+                .Where(a => a.GetName().Name.Contains("TitaniumForum"))
                 .SelectMany(a => a.GetTypes());
 
             allTypes
