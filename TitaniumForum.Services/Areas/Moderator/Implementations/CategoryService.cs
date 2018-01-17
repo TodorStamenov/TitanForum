@@ -22,6 +22,7 @@
         {
             return this.db
                 .Categories
+                .Get()
                 .Any(sc => sc.Id == id);
         }
 
@@ -29,7 +30,7 @@
         {
             return this.db
                 .Categories
-                .Where(c => c.Id == id)
+                .Get(filter: c => c.Id == id)
                 .Select(c => c.IsDeleted)
                 .FirstOrDefault();
         }
@@ -38,7 +39,7 @@
         {
             return this.db
                 .Categories
-                .Where(c => c.Id == id)
+                .Get(filter: c => c.Id == id)
                 .SelectMany(c => c.SubCategories.SelectMany(sc => sc.Questions))
                 .Where(q => !q.IsDeleted)
                 .Any();
@@ -48,6 +49,7 @@
         {
             return this.db
                 .Categories
+                .Get()
                 .Any(c => c.Name == name);
         }
 
@@ -55,7 +57,7 @@
         {
             return this.db
                 .Categories
-                .Where(c => c.Id == id)
+                .Get(filter: c => c.Id == id)
                 .Select(c => c.Name)
                 .FirstOrDefault();
         }
@@ -154,8 +156,8 @@
         {
             return this.db
                 .Categories
-                .AllEntries()
-                .Where(c => c.Id == id)
+                .Get(filter: c => c.Id == id)
+                .AsQueryable()
                 .ProjectTo<CategoryFormServiceModel>()
                 .FirstOrDefault();
         }
@@ -164,9 +166,8 @@
         {
             return this.db
                 .Categories
-                .AllEntries()
-                .Where(c => !c.IsDeleted)
-                .Where(c => c.SubCategories.Any(sc => sc.Questions.Any(q => !q.IsDeleted)))
+                .Get(filter: c => !c.IsDeleted
+                    && c.SubCategories.Any(sc => sc.Questions.Any(q => !q.IsDeleted)))
                 .Select(c => new MenuCategoryServiceModel
                 {
                     Id = c.Id,
@@ -186,7 +187,8 @@
         {
             return this.db
                 .Categories
-                .AllEntries()
+                .Get()
+                .AsQueryable()
                 .ProjectTo<ListCategoriesServiceModel>()
                 .ToList();
         }

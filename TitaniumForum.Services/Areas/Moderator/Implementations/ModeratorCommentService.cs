@@ -20,8 +20,7 @@
         {
             return this.db
                 .Comments
-                .AllEntries()
-                .Where(c => c.IsDeleted)
+                .Get(filter: c => c.IsDeleted)
                 .Filter(search)
                 .Count();
         }
@@ -65,8 +64,7 @@
         {
             return this.db
                 .Comments
-                .AllEntries()
-                .Where(c => c.IsDeleted)
+                .Get(filter: c => c.IsDeleted)
                 .Filter(search)
                 .OrderByDescending(c => c.DateAdded)
                 .Skip((page - 1) * pageSize)

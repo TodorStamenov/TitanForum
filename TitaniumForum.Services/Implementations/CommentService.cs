@@ -20,6 +20,7 @@
         {
             return this.db
                 .Comments
+                .Get()
                 .Any(c => c.Id == id && c.AuthorId == userId);
         }
 
@@ -27,7 +28,7 @@
         {
             var answerInfo = this.db
                 .Answers
-                .Where(a => a.Id == answerId)
+                .Get(filter: a => a.Id == answerId)
                 .Select(a => new
                 {
                     a.IsDeleted,
@@ -114,11 +115,12 @@
         {
             return this.db
                 .Comments
-                .AllEntries()
-                .Where(c => c.Id == id)
-                .Where(c => !c.Answer.IsDeleted)
-                .Where(c => !c.Answer.Question.IsDeleted)
-                .Where(c => !c.Answer.Question.IsLocked)
+                .Get(
+                    filter: c => c.Id == id
+                        && !c.Answer.IsDeleted
+                        && !c.Answer.Question.IsDeleted
+                        && !c.Answer.Question.IsLocked)
+                .AsQueryable()
                 .ProjectTo<CommentFormServiceModel>()
                 .FirstOrDefault();
         }

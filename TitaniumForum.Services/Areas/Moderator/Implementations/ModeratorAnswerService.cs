@@ -20,8 +20,7 @@
         {
             return this.db
                 .Answers
-                .AllEntries()
-                .Where(a => a.IsDeleted)
+                .Get(filter: a => a.IsDeleted)
                 .Filter(search)
                 .Count();
         }
@@ -75,8 +74,7 @@
         {
             return this.db
                 .Answers
-                .AllEntries()
-                .Where(a => a.IsDeleted)
+                .Get(filter: a => a.IsDeleted)
                 .Filter(search)
                 .OrderByDescending(a => a.DateAdded)
                 .Skip((page - 1) * pageSize)

@@ -20,6 +20,7 @@
         {
             return this.db
                 .Users
+                .Get()
                 .Count();
         }
 
@@ -43,11 +44,12 @@
         {
             return this.db
                 .Users
-                .OrderByDescending(u => u.Rating)
-                .ThenByDescending(u => this.GetPostsCount(u))
-                .ThenBy(u => u.UserName)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Get(
+                    orderBy: q => q.OrderByDescending(u => u.Rating)
+                        .ThenByDescending(u => u.Questions.Count + u.Answers.Count + u.Comments.Count)
+                        .ThenBy(u => u.UserName),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .Select(u => new ListUserRankingServiceModel
                 {
                     Username = u.UserName,

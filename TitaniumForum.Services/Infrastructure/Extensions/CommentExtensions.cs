@@ -1,11 +1,12 @@
 ﻿namespace TitaniumForum.Services.Infrastructure.Extensions
 {
     using Data.Models;
+    using System.Collections.Generic;
     using System.Linq;
 
     public static class CommentExtensions
     {
-        public static IQueryable<Comment> Filter(this IQueryable<Comment> comments, string searchTerm)
+        public static IEnumerable<Comment> Filter(this IEnumerable<Comment> comments, string searchTerm)
         {
             if (!string.IsNullOrEmpty(searchTerm)
                 && !string.IsNullOrWhiteSpace(searchTerm))

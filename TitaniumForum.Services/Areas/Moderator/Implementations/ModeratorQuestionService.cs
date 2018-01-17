@@ -23,8 +23,7 @@
         {
             return this.db
                 .Questions
-                .AllEntries()
-                .Where(q => q.IsDeleted)
+                .Get(filter: q => q.IsDeleted)
                 .Filter(search)
                 .Count();
         }
@@ -145,8 +144,8 @@
         {
             return this.db
                 .SubCategories
-                .AllEntries()
-                .Where(c => c.Id == subCategoryId)
+                .Get(filter: c => c.Id == subCategoryId)
+                .AsQueryable()
                 .ProjectTo<SubCategoryInfoServiceModel>()
                 .FirstOrDefault();
         }
@@ -155,10 +154,10 @@
         {
             return this.db
                 .Questions
-                .AllEntries()
-                .Where(q => q.IsReported)
-                .OrderByDescending(q => q.DateAdded)
-                .Take(questionsCount)
+                .Get(
+                    filter: q => q.IsReported,
+                    orderBy: q => q.OrderByDescending(question => question.DateAdded),
+                    take: questionsCount)
                 .ProjectToListModel()
                 .ToList();
         }
@@ -167,8 +166,7 @@
         {
             return this.db
                 .Questions
-                .AllEntries()
-                .Where(q => q.IsDeleted)
+                .Get(filter: q => q.IsDeleted)
                 .Filter(search)
                 .OrderByDescending(q => q.DateAdded)
                 .Skip((page - 1) * pageSize)

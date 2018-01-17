@@ -10,7 +10,6 @@
     using Services.Models.Users;
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Linq;
 
     public class AdminUserService : IAdminUserService
@@ -26,7 +25,7 @@
         {
             return this.db
                 .Users
-                .Where(u => u.Id == id)
+                .Get(filter: u => u.Id == id)
                 .Select(u => u.UserName)
                 .FirstOrDefault();
         }
@@ -49,7 +48,7 @@
         {
             var userRoleInfo = this.db
                 .Roles
-                .Where(r => r.Name == roleName)
+                .Get(filter: r => r.Name == roleName)
                 .Select(r => new
                 {
                     r.Id,
@@ -79,7 +78,7 @@
         {
             var userRoleInfo = this.db
                 .Roles
-                .Where(r => r.Name == roleName)
+                .Get(filter: r => r.Name == roleName)
                 .Select(r => new
                 {
                     r.Id,
@@ -107,7 +106,7 @@
         {
             return this.db
                 .Logs
-                .AllEntries()
+                .Get()
                 .Filter(search)
                 .Count();
         }
@@ -116,7 +115,7 @@
         {
             return this.db
                 .Users
-                .AllEntries()
+                .Get()
                 .Filter(search)
                 .InRole(role)
                 .Count();
@@ -126,7 +125,7 @@
         {
             return this.db
                 .Users
-                .Where(u => u.Id == id)
+                .Get(filter: u => u.Id == id)
                 .Select(u => new UserRolesServiceModel
                 {
                     Id = u.Id,
@@ -143,15 +142,16 @@
                 .FirstOrDefault();
         }
 
-        public IEnumerable<ListLogsServiceModel> Logs(int page, int itemsPerPage, string search)
+        public IEnumerable<ListLogsServiceModel> Logs(int page, int pageSize, string search)
         {
             return this.db
                 .Logs
-                .AllEntries()
+                .Get(
+                    orderBy: q => q.OrderByDescending(l => l.TimeStamp),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .Filter(search)
-                .OrderByDescending(l => l.TimeStamp)
-                .Skip((page - 1) * itemsPerPage)
-                .Take(itemsPerPage)
+                .AsQueryable()
                 .ProjectTo<ListLogsServiceModel>()
                 .ToList();
         }
@@ -160,21 +160,23 @@
         {
             return this.db
                 .Roles
-                .AllEntries()
+                .Get()
+                .AsQueryable()
                 .ProjectTo<RoleServiceModel>()
                 .ToList();
         }
 
-        public IEnumerable<ListUsersServiceModel> All(int page, string role, string search, int usersPerPage)
+        public IEnumerable<ListUsersServiceModel> All(int page, string role, string search, int pageSize)
         {
             return this.db
                 .Users
-                .AllEntries()
+                .Get(
+                    orderBy: q => q.OrderBy(u => u.UserName),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .Filter(search)
                 .InRole(role)
-                .OrderBy(u => u.UserName)
-                .Skip((page - 1) * usersPerPage)
-                .Take(usersPerPage)
+                .AsQueryable()
                 .ProjectTo<ListUsersServiceModel>()
                 .ToList();
         }

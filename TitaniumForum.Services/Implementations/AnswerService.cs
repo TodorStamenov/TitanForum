@@ -23,6 +23,7 @@
         {
             return this.db
                 .Answers
+                .Get()
                 .Any(a => a.Id == id && a.AuthorId == userId);
         }
 
@@ -30,8 +31,9 @@
         {
             return this.db
                 .Answers
-                .Where(a => a.QuestionId == questionId)
-                .Where(a => !a.IsDeleted)
+                .Get(
+                    filter: a => a.QuestionId == questionId
+                        && !a.IsDeleted)
                 .Count();
         }
 
@@ -39,7 +41,7 @@
         {
             var questionInfo = this.db
                 .Questions
-                .Where(q => q.Id == questionId)
+                .Get(filter: q => q.Id == questionId)
                 .Select(q => new
                 {
                     q.IsLocked,
@@ -126,10 +128,11 @@
         {
             return this.db
                 .Answers
-                .AllEntries()
-                .Where(a => a.Id == id)
-                .Where(a => !a.Question.IsDeleted)
-                .Where(a => !a.Question.IsLocked)
+                .Get(
+                    filter: a => a.Id == id
+                        && !a.Question.IsDeleted
+                        && !a.Question.IsLocked)
+                .AsQueryable()
                 .ProjectTo<AnswerFormServiceModel>()
                 .FirstOrDefault();
         }
@@ -138,11 +141,12 @@
         {
             return this.db
                 .Answers
-                .Where(a => a.QuestionId == questionId)
-                .Where(a => !a.IsDeleted)
-                .OrderBy(a => a.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Get(
+                    filter: a => a.QuestionId == questionId
+                        && !a.IsDeleted,
+                    orderBy: q => q.OrderBy(a => a.DateAdded),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .Select(a => new ListAnswersServiceModel
                 {
                     Id = a.Id,

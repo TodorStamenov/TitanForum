@@ -8,7 +8,7 @@
 
     public static class QuestionExtensions
     {
-        public static IQueryable<Question> Filter(this IQueryable<Question> questions, string searchTerm)
+        public static IEnumerable<Question> Filter(this IEnumerable<Question> questions, string searchTerm)
         {
             if (!string.IsNullOrEmpty(searchTerm)
                 && !string.IsNullOrWhiteSpace(searchTerm))
@@ -22,10 +22,9 @@
             return questions;
         }
 
-        public static IEnumerable<ListQuestionsServiceModel> ProjectToListModel(this IQueryable<Question> questions)
+        public static IEnumerable<ListQuestionsServiceModel> ProjectToListModel(this IEnumerable<Question> questions)
         {
             return questions
-                .AsEnumerable()
                 .Select(q => new ListQuestionsServiceModel
                 {
                     Id = q.Id,
@@ -45,10 +44,9 @@
                 });
         }
 
-        public static IEnumerable<ListDeletedQuestionsServiceModel> ProjectToDeletedListModel(this IQueryable<Question> questions)
+        public static IEnumerable<ListDeletedQuestionsServiceModel> ProjectToDeletedListModel(this IEnumerable<Question> questions)
         {
             return questions
-                .AsEnumerable()
                 .Select(q => new ListDeletedQuestionsServiceModel
                 {
                     Id = q.Id,

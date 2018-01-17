@@ -1,9 +1,11 @@
 ﻿namespace TitaniumForum.Data.Contracts
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
 
-    public interface IRepository<TEntity> : IEnumerable<TEntity> where TEntity : class
+    public interface IRepository<TEntity> where TEntity : class
     {
         void Add(TEntity entity);
 
@@ -17,6 +19,11 @@
 
         TEntity Find(int firstKey, int secondKey);
 
-        IQueryable<TEntity> AllEntries();
+        IEnumerable<TEntity> Get(
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            int? skip = null,
+            int? take = null,
+            string includeProperties = "");
     }
 }

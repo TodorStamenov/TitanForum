@@ -24,6 +24,7 @@
         {
             return this.db
                 .Questions
+                .Get()
                 .Any(c => c.Id == id && c.AuthorId == userId);
         }
 
@@ -31,6 +32,7 @@
         {
             return this.db
                 .Questions
+                .Get()
                 .Any(q => q.Title == title);
         }
 
@@ -38,7 +40,7 @@
         {
             return this.db
                 .Questions
-                .Where(q => q.Id == id)
+                .Get(filter: q => q.Id == id)
                 .Select(q => q.IsLocked)
                 .FirstOrDefault();
         }
@@ -47,7 +49,7 @@
         {
             return this.db
                 .Questions
-                .Where(q => q.Id == id)
+                .Get(filter: q => q.Id == id)
                 .Select(q => q.Title)
                 .FirstOrDefault();
         }
@@ -56,8 +58,7 @@
         {
             return this.db
                 .Questions
-                .AllEntries()
-                .Where(q => !q.IsDeleted)
+                .Get(filter: q => !q.IsDeleted)
                 .Filter(search)
                 .Count();
         }
@@ -66,8 +67,9 @@
         {
             return this.db
                 .Questions
-                .Where(q => q.SubCategory.CategoryId == categoryId)
-                .Where(q => !q.IsDeleted)
+                .Get(
+                    filter: q => q.SubCategory.CategoryId == categoryId
+                        && !q.IsDeleted)
                 .Count();
         }
 
@@ -75,8 +77,9 @@
         {
             return this.db
                 .Questions
-                .Where(q => q.SubCategoryId == subCategoryId)
-                .Where(q => !q.IsDeleted)
+                .Get(
+                    filter: q => q.SubCategoryId == subCategoryId
+                        && !q.IsDeleted)
                 .Count();
         }
 
@@ -84,8 +87,9 @@
         {
             return this.db
                 .Questions
-                .Where(q => q.Tags.Any(t => t.TagId == tagId))
-                .Where(q => !q.IsDeleted)
+                .Get(
+                    filter: q => q.Tags.Any(t => t.TagId == tagId)
+                        && !q.IsDeleted)
                 .Count();
         }
 
@@ -230,10 +234,11 @@
         {
             return this.db
                 .Questions
-                .Where(q => q.Id == id)
-                .Where(q => !q.IsDeleted)
-                .Where(q => !q.IsLocked)
-                .Where(q => !q.SubCategory.IsDeleted)
+                .Get(
+                    filter: q => q.Id == id
+                        && !q.IsDeleted
+                        && !q.IsLocked
+                        && !q.SubCategory.IsDeleted)
                 .Select(q => new QuestionFormServiceModel
                 {
                     Title = q.Title,
@@ -246,28 +251,29 @@
         public QuestionDetailsServiceModel Details(int id, int userId)
         {
             QuestionDetailsServiceModel model = this.db
-               .Questions
-               .Where(q => q.Id == id)
-               .Where(q => !q.IsDeleted)
-               .Select(q => new QuestionDetailsServiceModel
-               {
-                   Id = q.Id,
-                   Title = q.Title,
-                   Content = q.Content,
-                   DateAdded = q.DateAdded.ToLocalTime(),
-                   AuthorUsername = q.Author.UserName,
-                   AuthorProfileImage = q.Author.ProfileImage.ConvertImage(),
-                   Rating = q.Author.Rating,
-                   SubCategoryId = q.SubCategoryId,
-                   SubCategoryName = q.SubCategory.Name,
-                   UpVotes = q.Votes.Count(v => v.Direction == Direction.Like),
-                   DownVotes = q.Votes.Count(v => v.Direction == Direction.Dislike),
-                   IsOwner = q.AuthorId == userId,
-                   IsLocked = q.IsLocked,
-                   IsReported = q.IsReported,
-                   HasVoted = q.Votes.Any(v => v.UserId == userId)
-               })
-               .FirstOrDefault();
+                .Questions
+                .Get(
+                    filter: q => q.Id == id
+                        && !q.IsDeleted)
+                .Select(q => new QuestionDetailsServiceModel
+                {
+                    Id = q.Id,
+                    Title = q.Title,
+                    Content = q.Content,
+                    DateAdded = q.DateAdded.ToLocalTime(),
+                    AuthorUsername = q.Author.UserName,
+                    AuthorProfileImage = q.Author.ProfileImage.ConvertImage(),
+                    Rating = q.Author.Rating,
+                    SubCategoryId = q.SubCategoryId,
+                    SubCategoryName = q.SubCategory.Name,
+                    UpVotes = q.Votes.Count(v => v.Direction == Direction.Like),
+                    DownVotes = q.Votes.Count(v => v.Direction == Direction.Dislike),
+                    IsOwner = q.AuthorId == userId,
+                    IsLocked = q.IsLocked,
+                    IsReported = q.IsReported,
+                    HasVoted = q.Votes.Any(v => v.UserId == userId)
+                })
+                .FirstOrDefault();
 
             if (model == null)
             {
@@ -276,6 +282,7 @@
 
             Question question = this.db
                 .Questions
+                .Get()
                 .FirstOrDefault(q => q.Id == id);
 
             question.ViewCount++;
@@ -289,12 +296,12 @@
         {
             return this.db
                  .Questions
-                 .AllEntries()
-                 .Where(q => !q.IsDeleted)
-                 .Where(q => q.SubCategory.CategoryId == categoryId)
-                 .OrderByDescending(q => q.DateAdded)
-                 .Skip((page - 1) * pageSize)
-                 .Take(pageSize)
+                 .Get(
+                    filter: q => !q.IsDeleted
+                        && q.SubCategory.CategoryId == categoryId,
+                    orderBy: q => q.OrderByDescending(question => question.DateAdded),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                  .ProjectToListModel()
                  .ToList();
         }
@@ -303,12 +310,12 @@
         {
             return this.db
                 .Questions
-                .AllEntries()
-                .Where(q => !q.IsDeleted)
-                .Where(q => q.SubCategoryId == subCategoryId)
-                .OrderByDescending(q => q.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Get(
+                    filter: q => !q.IsDeleted
+                        && q.SubCategoryId == subCategoryId,
+                    orderBy: q => q.OrderByDescending(question => question.DateAdded),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .ProjectToListModel()
                 .ToList();
         }
@@ -317,12 +324,12 @@
         {
             return this.db
                 .Questions
-                .AllEntries()
-                .Where(q => !q.IsDeleted)
-                .Where(q => q.Tags.Any(t => t.TagId == tagId))
-                .OrderByDescending(q => q.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Get(
+                    filter: q => !q.IsDeleted
+                        && q.Tags.Any(t => t.TagId == tagId),
+                    orderBy: q => q.OrderByDescending(question => question.DateAdded),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .ProjectToListModel()
                 .ToList();
         }
@@ -331,8 +338,7 @@
         {
             return this.db
                 .Questions
-                .AllEntries()
-                .Where(q => !q.IsDeleted)
+                .Get(filter: q => !q.IsDeleted)
                 .Filter(search)
                 .OrderByDescending(q => q.DateAdded)
                 .Skip((page - 1) * pageSize)
@@ -345,8 +351,8 @@
         {
             return this.db
                 .SubCategories
-                .AllEntries()
-                .Where(c => c.Id == subCategoryId)
+                .Get(filter: c => c.Id == subCategoryId)
+                .AsQueryable()
                 .ProjectTo<SubCategoryInfoServiceModel>()
                 .FirstOrDefault();
         }
@@ -355,11 +361,9 @@
         {
             return this.db
                 .Tags
-                .Select(t => new ListTagsServiceModel
-                {
-                    Id = t.Id,
-                    Name = t.Name
-                })
+                .Get()
+                .AsQueryable()
+                .ProjectTo<ListTagsServiceModel>()
                 .ToList();
         }
 

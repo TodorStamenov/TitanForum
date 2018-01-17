@@ -1,11 +1,12 @@
 ﻿namespace TitaniumForum.Services.Infrastructure.Extensions
 {
     using Data.Models;
+    using System.Collections.Generic;
     using System.Linq;
 
     public static class LogExtensions
     {
-        public static IQueryable<Log> Filter(this IQueryable<Log> logs, string searchTerm)
+        public static IEnumerable<Log> Filter(this IEnumerable<Log> logs, string searchTerm)
         {
             if (!string.IsNullOrEmpty(searchTerm)
                 && !string.IsNullOrWhiteSpace(searchTerm))

@@ -19,6 +19,7 @@
         {
             return this.db
                 .Tags
+                .Get()
                 .Any(t => t.Id == id);
         }
 
@@ -26,8 +27,8 @@
         {
             return this.db
                 .Tags
-                .AllEntries()
-                .Where(t => t.Questions.Any(q => q.QuestionId == questionId))
+                .Get(filter: t => t.Questions.Any(q => q.QuestionId == questionId))
+                .AsQueryable()
                 .ProjectTo<ListTagsServiceModel>()
                 .ToList();
         }

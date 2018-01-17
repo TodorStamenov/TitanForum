@@ -1,11 +1,11 @@
 ﻿namespace TitaniumForum.Services.Areas.Admin
 {
+    using Data.Models;
     using Models.Logs;
     using Models.Roles;
     using Models.Users;
     using Services.Models.Users;
     using System.Collections.Generic;
-    using TitaniumForum.Data.Models;
 
     public interface IAdminUserService
     {
@@ -23,10 +23,10 @@
 
         UserRolesServiceModel Roles(int id);
 
-        IEnumerable<ListLogsServiceModel> Logs(int page, int itemsPerPage, string search);
+        IEnumerable<ListLogsServiceModel> Logs(int page, int pageSize, string search);
 
         IEnumerable<RoleServiceModel> AllRoles();
 
-        IEnumerable<ListUsersServiceModel> All(int page, string role, string search, int usersPerPage);
+        IEnumerable<ListUsersServiceModel> All(int page, string role, string search, int pageSize);
     }
 }
