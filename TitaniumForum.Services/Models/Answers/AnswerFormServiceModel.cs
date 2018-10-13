@@ -1,12 +1,10 @@
 ﻿namespace TitaniumForum.Services.Models.Answers
 {
-    using Common.Mapping;
     using Data;
-    using Data.Models;
     using Questions;
     using System.ComponentModel.DataAnnotations;
 
-    public class AnswerFormServiceModel : IMapFrom<Answer>
+    public class AnswerFormServiceModel
     {
         [Required]
         [StringLength(

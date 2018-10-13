@@ -1,8 +1,8 @@
 ﻿namespace TitaniumForum.Services.Implementations
 {
     using Areas.Moderator.Models.SubCategories;
-    using AutoMapper.QueryableExtensions;
     using Data;
+    using Data.Contracts;
     using Data.Models;
     using Infrastructure.Extensions;
     using Models.Questions;
@@ -11,86 +11,77 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class QuestionService : IQuestionService
+    public class QuestionService : Service, IQuestionService
     {
-        private readonly UnitOfWork db;
-
-        public QuestionService(UnitOfWork db)
+        public QuestionService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public bool CanEdit(int id, int userId)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get()
                 .Any(c => c.Id == id && c.AuthorId == userId);
         }
 
         public bool TitleExists(string title)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get()
                 .Any(q => q.Title == title);
         }
 
         public bool IsLocked(int id)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(filter: q => q.Id == id)
-                .Select(q => q.IsLocked)
-                .FirstOrDefault();
+                .Any(q => q.Id == id && q.IsLocked);
         }
 
         public string GetTitle(int id)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(filter: q => q.Id == id)
-                .Select(q => q.Title)
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: q => q.Title,
+                    filter: q => q.Id == id);
         }
 
         public int Total(string search)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(filter: q => !q.IsDeleted)
-                .Filter(search)
-                .Count();
+                .Count(q => !q.IsDeleted
+                    && (!string.IsNullOrEmpty(search)
+                        ? (q.Title.ToLower().Contains(search.ToLower())
+                            || q.Content.ToLower().Contains(search.ToLower())
+                            || q.Tags.Any(t => t.Tag.Name.ToLower().Contains(search.ToLower())))
+                        : true));
         }
 
         public int TotalByCategory(int categoryId)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(
-                    filter: q => q.SubCategory.CategoryId == categoryId
-                        && !q.IsDeleted)
-                .Count();
+                .Count(q => !q.IsDeleted
+                    && q.SubCategory.CategoryId == categoryId);
         }
 
         public int TotalBySubCategory(int subCategoryId)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(
-                    filter: q => q.SubCategoryId == subCategoryId
-                        && !q.IsDeleted)
-                .Count();
+                .Count(q => !q.IsDeleted
+                    && q.SubCategoryId == subCategoryId);
         }
 
         public int TotalByTag(int tagId)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(
-                    filter: q => q.Tags.Any(t => t.TagId == tagId)
-                        && !q.IsDeleted)
-                .Count();
+                .Count(q => !q.IsDeleted
+                    && q.Tags.Any(t => t.TagId == tagId));
         }
 
         public int Create(int authorId, string title, string content, string tags, int subCategoryId)
@@ -126,15 +117,15 @@
 
             AddTagsToQuestion(tagTokens, question);
 
-            this.db.Questions.Add(question);
-            this.db.Save();
+            this.Database.Questions.Add(question);
+            this.Database.Save();
 
             return question.Id;
         }
 
         public bool Edit(int id, string title, string content, string tags, int subCategoryId)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
 
             if (question == null
                 || question.IsDeleted
@@ -168,14 +159,14 @@
 
             AddTagsToQuestion(tagTokens, question);
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Report(int id)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
 
             if (question == null
                 || question.IsLocked
@@ -191,14 +182,14 @@
 
             question.IsReported = true;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Vote(int id, int userId, Direction voteDirection)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
 
             if (question == null
                 || question.IsDeleted
@@ -225,14 +216,14 @@
                 user.Rating--;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public QuestionFormServiceModel GetForm(int id)
         {
-            return this.db
+            return this.Database
                 .Questions
                 .Get(
                     filter: q => q.Id == id
@@ -250,11 +241,18 @@
 
         public QuestionDetailsServiceModel Details(int id, int userId)
         {
-            QuestionDetailsServiceModel model = this.db
+            Question question = this.Database
                 .Questions
-                .Get(
-                    filter: q => q.Id == id
-                        && !q.IsDeleted)
+                .Find(id);
+
+            if (question == null)
+            {
+                return null;
+            }
+
+            question.ViewCount++;
+
+            QuestionDetailsServiceModel model = Enumerable.Repeat(question, 1)
                 .Select(q => new QuestionDetailsServiceModel
                 {
                     Id = q.Id,
@@ -275,26 +273,14 @@
                 })
                 .FirstOrDefault();
 
-            if (model == null)
-            {
-                return null;
-            }
-
-            Question question = this.db
-                .Questions
-                .Get()
-                .FirstOrDefault(q => q.Id == id);
-
-            question.ViewCount++;
-
-            this.db.Save();
+            this.Database.Save();
 
             return model;
         }
 
         public IEnumerable<ListQuestionsServiceModel> ByCategory(int page, int pageSize, int categoryId)
         {
-            return this.db
+            return this.Database
                  .Questions
                  .Get(
                     filter: q => !q.IsDeleted
@@ -308,7 +294,7 @@
 
         public IEnumerable<ListQuestionsServiceModel> BySubCategory(int page, int pageSize, int subCategoryId)
         {
-            return this.db
+            return this.Database
                 .Questions
                 .Get(
                     filter: q => !q.IsDeleted
@@ -322,7 +308,7 @@
 
         public IEnumerable<ListQuestionsServiceModel> ByTag(int page, int pageSize, int tagId)
         {
-            return this.db
+            return this.Database
                 .Questions
                 .Get(
                     filter: q => !q.IsDeleted
@@ -336,46 +322,46 @@
 
         public IEnumerable<ListQuestionsServiceModel> All(int page, int pageSize, string search)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(filter: q => !q.IsDeleted)
-                .Filter(search)
-                .OrderByDescending(q => q.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Get(
+                    skip: (page - 1) * pageSize,
+                    take: pageSize,
+                    orderBy: e => e.OrderByDescending(q => q.DateAdded),
+                    filter: q => !q.IsDeleted
+                        && (!string.IsNullOrEmpty(search)
+                            ? (q.Title.ToLower().Contains(search.ToLower())
+                                || q.Content.ToLower().Contains(search.ToLower())
+                                || q.Tags.Any(t => t.Tag.Name.ToLower().Contains(search.ToLower())))
+                            : true))
                 .ProjectToListModel()
                 .ToList();
         }
 
         private SubCategoryInfoServiceModel GetSubCategoryInfo(int subCategoryId)
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get(filter: c => c.Id == subCategoryId)
-                .AsQueryable()
-                .ProjectTo<SubCategoryInfoServiceModel>()
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: c => new SubCategoryInfoServiceModel { IsDeleted = c.IsDeleted },
+                    filter: c => c.Id == subCategoryId);
         }
 
         private List<ListTagsServiceModel> GetTagInfo()
         {
-            return this.db
+            return this.Database
                 .Tags
-                .Get()
-                .AsQueryable()
-                .ProjectTo<ListTagsServiceModel>()
+                .Project(t => new ListTagsServiceModel { Id = t.Id, Name = t.Name })
                 .ToList();
         }
 
         private List<string> GetTags(string tags)
         {
             return tags
-                .Split(
-                    new[] { ' ', ',' },
-                    StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Distinct()
-                .Where(t => t.Length >= DataConstants.TagConstants.MinNameLength)
-                .Where(t => t.Length <= DataConstants.TagConstants.MaxNameLength)
+                .Where(t => t.Length >= DataConstants.TagConstants.MinNameLength
+                    && t.Length <= DataConstants.TagConstants.MaxNameLength)
                 .ToList();
         }
 
@@ -392,8 +378,8 @@
                         Name = tagName
                     };
 
-                    this.db.Tags.Add(tag);
-                    this.db.Save();
+                    this.Database.Tags.Add(tag);
+                    this.Database.Save();
                     tagInfo.Add(new ListTagsServiceModel
                     {
                         Id = tag.Id,

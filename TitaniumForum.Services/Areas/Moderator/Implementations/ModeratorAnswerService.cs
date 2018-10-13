@@ -1,33 +1,33 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator.Implementations
 {
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Infrastructure.Extensions;
     using Models.Answers;
+    using Services.Implementations;
     using System.Collections.Generic;
     using System.Linq;
 
-    public class ModeratorAnswerService : IModeratorAnswerService
+    public class ModeratorAnswerService : Service, IModeratorAnswerService
     {
-        private readonly UnitOfWork db;
-
-        public ModeratorAnswerService(UnitOfWork db)
+        public ModeratorAnswerService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public int DeletedCount(string search)
         {
-            return this.db
+            return this.Database
                 .Answers
-                .Get(filter: a => a.IsDeleted)
-                .Filter(search)
-                .Count();
+                .Count(a => a.IsDeleted
+                    && (!string.IsNullOrEmpty(search)
+                        ? a.Content.ToLower().Contains(search.ToLower())
+                        : true));
         }
 
         public bool Delete(int id)
         {
-            Answer answer = this.db.Answers.Find(id);
+            Answer answer = this.Database.Answers.Find(id);
 
             if (answer == null
                 || answer.IsDeleted)
@@ -42,14 +42,14 @@
                 comment.IsDeleted = true;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Restore(int id)
         {
-            Answer answer = this.db.Answers.Find(id);
+            Answer answer = this.Database.Answers.Find(id);
 
             if (answer == null
                 || !answer.IsDeleted
@@ -65,21 +65,23 @@
                 comment.IsDeleted = false;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public IEnumerable<ListDeletedAnswersServiceModel> Deleted(int page, int pageSize, string search)
         {
-            return this.db
+            return this.Database
                 .Answers
-                .Get(filter: a => a.IsDeleted)
-                .Filter(search)
-                .OrderByDescending(a => a.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .AsEnumerable()
+                .Get(
+                    filter: a => a.IsDeleted
+                        && (!string.IsNullOrEmpty(search)
+                            ? a.Content.ToLower().Contains(search.ToLower())
+                            : true),
+                    orderBy: e => e.OrderByDescending(a => a.DateAdded),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .Select(a => new ListDeletedAnswersServiceModel
                 {
                     Id = a.Id,

@@ -1,9 +1,6 @@
 ﻿namespace TitaniumForum.Services.Models.Tags
 {
-    using Common.Mapping;
-    using Data.Models;
-
-    public class ListTagsServiceModel : IMapFrom<Tag>
+    public class ListTagsServiceModel
     {
         public int Id { get; set; }
 

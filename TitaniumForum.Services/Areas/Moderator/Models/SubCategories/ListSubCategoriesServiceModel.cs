@@ -1,9 +1,6 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator.Models.SubCategories
 {
-    using Common.Mapping;
-    using Data.Models;
-
-    public class ListSubCategoriesServiceModel : IMapFrom<SubCategory>
+    public class ListSubCategoriesServiceModel
     {
         public int Id { get; set; }
 

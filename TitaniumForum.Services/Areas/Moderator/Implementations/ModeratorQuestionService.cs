@@ -1,36 +1,37 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator.Implementations
 {
-    using AutoMapper.QueryableExtensions;
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Infrastructure.Extensions;
     using Models.Questions;
     using Models.SubCategories;
+    using Services.Implementations;
     using Services.Models.Questions;
     using System.Collections.Generic;
     using System.Linq;
 
-    public class ModeratorQuestionService : IModeratorQuestionService
+    public class ModeratorQuestionService : Service, IModeratorQuestionService
     {
-        private readonly UnitOfWork db;
-
-        public ModeratorQuestionService(UnitOfWork db)
+        public ModeratorQuestionService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public int DeletedCount(string search)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(filter: q => q.IsDeleted)
-                .Filter(search)
-                .Count();
+                .Count(q => q.IsDeleted
+                    && !string.IsNullOrEmpty(search)
+                        ? (q.Title.ToLower().Contains(search.ToLower())
+                            || q.Content.ToLower().Contains(search.ToLower())
+                            || q.Tags.Any(t => t.Tag.Name.ToLower().Contains(search.ToLower())))
+                        : true);
         }
 
         public bool Delete(int id)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
 
             if (question == null
                 || question.IsDeleted)
@@ -50,14 +51,14 @@
                 answer.IsDeleted = true;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Restore(int id)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
             SubCategoryInfoServiceModel subCategoryInfo = this.GetSubCategoryInfo(question.SubCategoryId);
 
             if (question == null
@@ -80,14 +81,14 @@
                 answer.IsDeleted = false;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Lock(int id)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
 
             if (question == null
                 || question.IsLocked
@@ -99,14 +100,14 @@
             question.IsLocked = true;
             question.IsReported = false;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Unlock(int id)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
 
             if (question == null
                 || !question.IsLocked
@@ -118,14 +119,14 @@
             question.IsLocked = false;
             question.IsReported = false;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Conceal(int id)
         {
-            Question question = this.db.Questions.Find(id);
+            Question question = this.Database.Questions.Find(id);
 
             if (question == null
                 || !question.IsReported)
@@ -135,24 +136,23 @@
 
             question.IsReported = false;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         private SubCategoryInfoServiceModel GetSubCategoryInfo(int subCategoryId)
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get(filter: c => c.Id == subCategoryId)
-                .AsQueryable()
-                .ProjectTo<SubCategoryInfoServiceModel>()
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: c => new SubCategoryInfoServiceModel { IsDeleted = c.IsDeleted },
+                    filter: c => c.Id == subCategoryId);
         }
 
         public IEnumerable<ListQuestionsServiceModel> Reported(int questionsCount)
         {
-            return this.db
+            return this.Database
                 .Questions
                 .Get(
                     filter: q => q.IsReported,
@@ -164,13 +164,18 @@
 
         public IEnumerable<ListDeletedQuestionsServiceModel> Deleted(int page, int pageSize, string search)
         {
-            return this.db
+            return this.Database
                 .Questions
-                .Get(filter: q => q.IsDeleted)
-                .Filter(search)
-                .OrderByDescending(q => q.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Get(
+                    filter: q => q.IsDeleted
+                        && (!string.IsNullOrEmpty(search)
+                            ? (q.Title.ToLower().Contains(search.ToLower())
+                                || q.Content.ToLower().Contains(search.ToLower())
+                                || q.Tags.Any(t => t.Tag.Name.ToLower().Contains(search.ToLower())))
+                            : true),
+                    orderBy: e => e.OrderByDescending(q => q.DateAdded),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .ProjectToDeletedListModel()
                 .ToList();
         }

@@ -1,16 +1,17 @@
 ﻿namespace TitaniumForum.Data.Repositories
 {
-    using Contracts;
+    using Data.Contracts;
+    using Data.Infrastructure.Extensions;
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
     using System.Linq.Expressions;
 
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, new()
     {
-        protected readonly TitaniumForumDbContext context;
         protected readonly DbSet<TEntity> dbSet;
+        protected readonly TitaniumForumDbContext context;
 
         public Repository(TitaniumForumDbContext context)
         {
@@ -48,42 +49,84 @@
             return this.dbSet.Find(firstKey, secondKey);
         }
 
+        public bool Any(Expression<Func<TEntity, bool>> expression)
+        {
+            return this.dbSet.Any(expression);
+        }
+
+        public bool All(Expression<Func<TEntity, bool>> expression)
+        {
+            return this.dbSet.All(expression);
+        }
+
+        public int Count(Expression<Func<TEntity, bool>> expression = null)
+        {
+            return this.dbSet.CountElements(expression);
+        }
+
+        public TEntity FirstOrDefault(
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
+        {
+            return this.ComposeQuery(
+                    filter: filter,
+                    orderBy: orderBy)
+                .FirstOrDefault();
+        }
+
         public IEnumerable<TEntity> Get(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             int? skip = null,
-            int? take = null,
-            string includeProperties = "")
+            int? take = null)
         {
-            IQueryable<TEntity> query = this.dbSet;
+            return this.ComposeQuery(
+                    filter: filter,
+                    orderBy: orderBy,
+                    skip: skip,
+                    take: take)
+                .ToList();
+        }
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
+        public TResult ProjectSingle<TResult>(
+            Expression<Func<TEntity, TResult>> projection,
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null)
+        {
+            return this.ComposeQuery(
+                    filter: filter,
+                    orderBy: orderBy)
+                .Select(projection)
+                .FirstOrDefault();
+        }
 
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
+        public IEnumerable<TResult> Project<TResult>(
+            Expression<Func<TEntity, TResult>> projection,
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            int? skip = null,
+            int? take = null)
+        {
+            return this.ComposeQuery(
+                    filter: filter,
+                    orderBy: orderBy,
+                    skip: skip,
+                    take: take)
+                .Select(projection)
+                .ToList();
+        }
 
-            if (orderBy != null)
-            {
-                query = orderBy(query);
-            }
-
-            if (skip != null)
-            {
-                query = query.Skip(skip.Value);
-            }
-
-            if (take != null)
-            {
-                query = query.Take(take.Value);
-            }
-
-            return query.ToList();
+        private IQueryable<TEntity> ComposeQuery(
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            int? skip = null,
+            int? take = null)
+        {
+            return this.dbSet
+                .FilterElements(filter)
+                .OrderElements(orderBy)
+                .SkipElements(skip)
+                .TakeElements(take);
         }
     }
 }

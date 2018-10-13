@@ -1,65 +1,59 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator.Implementations
 {
-    using AutoMapper.QueryableExtensions;
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Models.Categories;
     using Models.SubCategories;
-    using Services.Models.Categories;
+    using Services.Implementations;
     using System.Collections.Generic;
     using System.Linq;
+    using TitaniumForum.Services.Models.SubCategories;
 
-    public class SubCategoryService : ISubCategoryService
+    public class SubCategoryService : Service, ISubCategoryService
     {
-        private readonly UnitOfWork db;
-
-        public SubCategoryService(UnitOfWork db)
+        public SubCategoryService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public bool Exists(int id)
         {
-            return this.db
+            return this.Database
                  .SubCategories
-                 .Get()
                  .Any(sc => sc.Id == id);
         }
 
         public bool IsDeleted(int id)
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get(filter: c => c.Id == id)
-                .Select(c => c.IsDeleted)
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: c => c.IsDeleted,
+                    filter: c => c.Id == id);
         }
 
         public bool HasQuestions(int id)
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get(filter: sc => sc.Id == id)
-                .SelectMany(sc => sc.Questions)
-                .Where(q => !q.IsDeleted)
-                .Any();
+                .Any(sc => sc.Id == id
+                    && sc.Questions.Where(q => !q.IsDeleted).Any());
         }
 
         public bool NameExists(string name)
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get()
                 .Any(sc => sc.Name == name);
         }
 
         public string GetName(int id)
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get(filter: sc => sc.Id == id)
-                .Select(sc => sc.Name)
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: sc => sc.Name,
+                    filter: sc => sc.Id == id);
         }
 
         public bool Create(int categoryId, string name)
@@ -79,15 +73,15 @@
                 Name = name
             };
 
-            this.db.SubCategories.Add(subCategory);
-            this.db.Save();
+            this.Database.SubCategories.Add(subCategory);
+            this.Database.Save();
 
             return true;
         }
 
         public bool Edit(int id, int categoryId, string name)
         {
-            SubCategory subCategory = this.db.SubCategories.Find(id);
+            SubCategory subCategory = this.Database.SubCategories.Find(id);
 
             CategoryInfoServiceModel categoryInfo = this.GetCategoryInfo(categoryId);
 
@@ -103,14 +97,14 @@
             subCategory.CategoryId = categoryId;
             subCategory.Name = name;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Delete(int id)
         {
-            SubCategory subCategory = this.db.SubCategories.Find(id);
+            SubCategory subCategory = this.Database.SubCategories.Find(id);
 
             if (subCategory == null
                 || subCategory.IsDeleted)
@@ -135,14 +129,14 @@
                 question.IsDeleted = true;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Restore(int id)
         {
-            SubCategory subCategory = this.db.SubCategories.Find(id);
+            SubCategory subCategory = this.Database.SubCategories.Find(id);
 
             if (subCategory == null
                 || !subCategory.IsDeleted
@@ -153,41 +147,41 @@
 
             subCategory.IsDeleted = false;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public SubCategoryFormServiceModel GetForm(int id)
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get(filter: sc => sc.Id == id)
-                .AsQueryable()
-                .ProjectTo<SubCategoryFormServiceModel>()
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: sc => new SubCategoryFormServiceModel { Name = sc.Name },
+                    filter: sc => sc.Id == id);
         }
 
-        public IEnumerable<MenuCategoryServiceModel> GetMenu()
+        public IEnumerable<MenuSubCategoryServiceModel> GetMenu()
         {
-            return this.db
+            return this.Database
                 .SubCategories
-                .Get(
+                .Project(
+                    projection: sc => new MenuSubCategoryServiceModel
+                    {
+                        Id = sc.Id,
+                        Name = sc.Name
+                    },
                     filter: sc => !sc.IsDeleted,
-                    orderBy: q => q.OrderBy(sc => sc.Name))
-                .AsQueryable()
-                .ProjectTo<MenuCategoryServiceModel>()
-                .ToList();
+                    orderBy: q => q.OrderBy(sc => sc.Name));
         }
 
         private CategoryInfoServiceModel GetCategoryInfo(int categoryId)
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get(filter: c => c.Id == categoryId)
-                .AsQueryable()
-                .ProjectTo<CategoryInfoServiceModel>()
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: c => new CategoryInfoServiceModel { IsDeleted = c.IsDeleted },
+                    filter: c => c.Id == categoryId);
         }
     }
 }

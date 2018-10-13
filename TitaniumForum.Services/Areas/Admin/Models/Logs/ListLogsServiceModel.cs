@@ -1,10 +1,9 @@
 ﻿namespace TitaniumForum.Services.Areas.Admin.Models.Logs
 {
-    using Common.Mapping;
     using Data.Models;
     using System;
 
-    public class ListLogsServiceModel : IMapFrom<Log>
+    public class ListLogsServiceModel
     {
         public string Username { get; set; }
 

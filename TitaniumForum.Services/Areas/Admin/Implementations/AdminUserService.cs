@@ -1,33 +1,31 @@
 ﻿namespace TitaniumForum.Services.Areas.Admin.Implementations
 {
-    using AutoMapper.QueryableExtensions;
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Infrastructure.Extensions;
     using Models.Logs;
     using Models.Roles;
     using Models.Users;
+    using Services.Implementations;
     using Services.Models.Users;
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    public class AdminUserService : IAdminUserService
+    public class AdminUserService : Service, IAdminUserService
     {
-        private readonly UnitOfWork db;
-
-        public AdminUserService(UnitOfWork db)
+        public AdminUserService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public string GetUsername(int id)
         {
-            return this.db
+            return this.Database
                 .Users
-                .Get(filter: u => u.Id == id)
-                .Select(u => u.UserName)
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: u => u.UserName,
+                    filter: u => u.Id == id);
         }
 
         public void Log(string username, LogType action, string tableName)
@@ -40,21 +38,21 @@
                 TimeStamp = DateTime.UtcNow
             };
 
-            this.db.Logs.Add(log);
-            this.db.Save();
+            this.Database.Logs.Add(log);
+            this.Database.Save();
         }
 
         public bool AddToRole(int userId, string roleName)
         {
-            var userRoleInfo = this.db
+            var userRoleInfo = this.Database
                 .Roles
-                .Get(filter: r => r.Name == roleName)
-                .Select(r => new
-                {
-                    r.Id,
-                    InRole = r.Users.Any(u => u.UserId == userId)
-                })
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: r => new
+                    {
+                        r.Id,
+                        InRole = r.Users.Any(u => u.UserId == userId)
+                    },
+                    filter: r => r.Name == roleName);
 
             if (userRoleInfo == null
                 || userRoleInfo.InRole)
@@ -68,23 +66,23 @@
                 UserId = userId
             };
 
-            this.db.UserRoles.Add(userRole);
-            this.db.Save();
+            this.Database.UserRoles.Add(userRole);
+            this.Database.Save();
 
             return true;
         }
 
         public bool RemoveFromRole(int userId, string roleName)
         {
-            var userRoleInfo = this.db
+            var userRoleInfo = this.Database
                 .Roles
-                .Get(filter: r => r.Name == roleName)
-                .Select(r => new
-                {
-                    r.Id,
-                    InRole = r.Users.Any(u => u.UserId == userId)
-                })
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: r => new
+                    {
+                        r.Id,
+                        InRole = r.Users.Any(u => u.UserId == userId)
+                    },
+                    filter: r => r.Name == roleName);
 
             if (userRoleInfo == null
                 || !userRoleInfo.InRole)
@@ -92,38 +90,42 @@
                 return false;
             }
 
-            UserRole userRole = this.db
+            UserRole userRole = this.Database
                 .UserRoles
                 .Find(userId, userRoleInfo.Id);
 
-            this.db.UserRoles.Delete(userRole);
-            this.db.Save();
+            this.Database.UserRoles.Delete(userRole);
+            this.Database.Save();
 
             return true;
         }
 
         public int Total(string search)
         {
-            return this.db
+            return this.Database
                 .Logs
-                .Get()
-                .Filter(search)
-                .Count();
+                .Count(l =>
+                    !string.IsNullOrEmpty(search)
+                        ? l.Username.ToLower().Contains(search.ToLower())
+                        : true);
         }
 
         public int Total(string role, string search)
         {
-            return this.db
+            return this.Database
                 .Users
-                .Get()
-                .Filter(search)
-                .InRole(role)
-                .Count();
+                .Count(u =>
+                    !string.IsNullOrEmpty(search)
+                        ? u.UserName.ToLower().Contains(search.ToLower())
+                        : true
+                    && !string.IsNullOrEmpty(role)
+                        ? u.Roles.Any(r => r.Role.Name.ToLower() == role.ToLower())
+                        : true);
         }
 
         public UserRolesServiceModel Roles(int id)
         {
-            return this.db
+            return this.Database
                 .Users
                 .Get(filter: u => u.Id == id)
                 .Select(u => new UserRolesServiceModel
@@ -144,41 +146,53 @@
 
         public IEnumerable<ListLogsServiceModel> Logs(int page, int pageSize, string search)
         {
-            return this.db
+            return this.Database
                 .Logs
-                .Get(
+                .Project(
+                    projection: l => new ListLogsServiceModel
+                    {
+                        Username = l.Username,
+                        TableName = l.TableName,
+                        LogType = l.LogType,
+                        TimeStamp = l.TimeStamp
+                    },
+                    filter: l =>
+                        !string.IsNullOrEmpty(search)
+                            ? l.Username.ToLower().Contains(search.ToLower())
+                            : true,
                     orderBy: q => q.OrderByDescending(l => l.TimeStamp),
                     skip: (page - 1) * pageSize,
-                    take: pageSize)
-                .Filter(search)
-                .AsQueryable()
-                .ProjectTo<ListLogsServiceModel>()
-                .ToList();
+                    take: pageSize);
         }
 
         public IEnumerable<RoleServiceModel> AllRoles()
         {
-            return this.db
+            return this.Database
                 .Roles
-                .Get()
-                .AsQueryable()
-                .ProjectTo<RoleServiceModel>()
-                .ToList();
+                .Project(projection: r => new RoleServiceModel { Id = r.Id, Name = r.Name });
         }
 
         public IEnumerable<ListUsersServiceModel> All(int page, string role, string search, int pageSize)
         {
-            return this.db
+            return this.Database
                 .Users
-                .Get(
+                .Project(
+                    projection: u => new ListUsersServiceModel
+                    {
+                        Id = u.Id,
+                        Email = u.Email,
+                        Username = u.UserName
+                    },
+                    filter: u =>
+                        !string.IsNullOrEmpty(search)
+                            ? u.UserName.ToLower().Contains(search.ToLower())
+                            : true
+                        && !string.IsNullOrEmpty(role)
+                            ? u.Roles.Any(r => r.Role.Name.ToLower() == role.ToLower())
+                            : true,
                     orderBy: q => q.OrderBy(u => u.UserName),
                     skip: (page - 1) * pageSize,
-                    take: pageSize)
-                .Filter(search)
-                .InRole(role)
-                .AsQueryable()
-                .ProjectTo<ListUsersServiceModel>()
-                .ToList();
+                    take: pageSize);
         }
     }
 }

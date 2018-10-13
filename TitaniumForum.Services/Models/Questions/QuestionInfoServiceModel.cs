@@ -1,9 +1,6 @@
 ﻿namespace TitaniumForum.Services.Models.Questions
 {
-    using Common.Mapping;
-    using Data.Models;
-
-    public class QuestionInfoServiceModel : IMapFrom<Question>
+    public class QuestionInfoServiceModel
     {
         public bool IsDeleted { get; set; }
 

@@ -1,12 +1,10 @@
 ﻿namespace TitaniumForum.Services.Models.Comments
 {
-    using Common.Mapping;
     using Data;
-    using Data.Models;
     using Questions;
     using System.ComponentModel.DataAnnotations;
 
-    public class CommentFormServiceModel : IMapFrom<Comment>
+    public class CommentFormServiceModel
     {
         [Required]
         [StringLength(

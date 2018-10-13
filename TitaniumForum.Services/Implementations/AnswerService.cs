@@ -1,7 +1,6 @@
 ﻿namespace TitaniumForum.Services.Implementations
 {
-    using AutoMapper.QueryableExtensions;
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Infrastructure.Extensions;
     using Models.Answers;
@@ -10,44 +9,34 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class AnswerService : IAnswerService
+    public class AnswerService : Service, IAnswerService
     {
-        private readonly UnitOfWork db;
-
-        public AnswerService(UnitOfWork db)
+        public AnswerService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public bool CanEdit(int id, int userId)
         {
-            return this.db
+            return this.Database
                 .Answers
-                .Get()
                 .Any(a => a.Id == id && a.AuthorId == userId);
         }
 
         public int TotalByQuestion(int questionId)
         {
-            return this.db
+            return this.Database
                 .Answers
-                .Get(
-                    filter: a => a.QuestionId == questionId
-                        && !a.IsDeleted)
-                .Count();
+                .Count(a => a.QuestionId == questionId && !a.IsDeleted);
         }
 
         public bool Create(int questionId, int authorId, string content)
         {
-            var questionInfo = this.db
+            var questionInfo = this.Database
                 .Questions
-                .Get(filter: q => q.Id == questionId)
-                .Select(q => new
-                {
-                    q.IsLocked,
-                    q.IsDeleted
-                })
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: q => new { q.IsLocked, q.IsDeleted },
+                    filter: q => q.Id == questionId);
 
             if (questionInfo == null
                 || questionInfo.IsLocked
@@ -64,15 +53,15 @@
                 QuestionId = questionId
             };
 
-            this.db.Answers.Add(answer);
-            this.db.Save();
+            this.Database.Answers.Add(answer);
+            this.Database.Save();
 
             return true;
         }
 
         public bool Edit(int id, string content)
         {
-            Answer answer = this.db.Answers.Find(id);
+            Answer answer = this.Database.Answers.Find(id);
 
             if (answer == null
                 || answer.IsDeleted
@@ -84,14 +73,14 @@
 
             answer.Content = content;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Vote(int id, int userId, Direction voteDirection)
         {
-            Answer answer = this.db.Answers.Find(id);
+            Answer answer = this.Database.Answers.Find(id);
 
             if (answer == null
                 || answer.IsDeleted
@@ -119,31 +108,29 @@
                 user.Rating--;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public AnswerFormServiceModel GetForm(int id)
         {
-            return this.db
+            return this.Database
                 .Answers
-                .Get(
+                .ProjectSingle(
+                    projection: a => new AnswerFormServiceModel { Content = a.Content },
                     filter: a => a.Id == id
                         && !a.Question.IsDeleted
-                        && !a.Question.IsLocked)
-                .AsQueryable()
-                .ProjectTo<AnswerFormServiceModel>()
-                .FirstOrDefault();
+                        && !a.Question.IsLocked);
         }
 
         public IEnumerable<ListAnswersServiceModel> ByQuestion(int questionId, int userId, int page, int pageSize)
         {
-            return this.db
+            return this.Database
                 .Answers
                 .Get(
-                    filter: a => a.QuestionId == questionId
-                        && !a.IsDeleted,
+                    filter: a => !a.IsDeleted
+                        && a.QuestionId == questionId,
                     orderBy: q => q.OrderBy(a => a.DateAdded),
                     skip: (page - 1) * pageSize,
                     take: pageSize)
@@ -176,8 +163,7 @@
                             HasVoted = c.Votes.Any(v => v.UserId == userId)
                         })
                         .ToList()
-                })
-                .ToList();
+                });
         }
     }
 }

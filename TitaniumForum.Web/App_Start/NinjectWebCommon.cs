@@ -18,6 +18,8 @@ namespace TitaniumForum.Web
     using System.Data.Entity;
     using System.Reflection;
     using System.Web;
+    using TitaniumForum.Data.Contracts;
+    using Database = Data.Database;
 
     public static class NinjectWebCommon
     {
@@ -74,7 +76,7 @@ namespace TitaniumForum.Web
             kernel.Bind<DbContext>().ToConstructor(_ => new TitaniumForumDbContext());
 
             kernel.Bind<TitaniumForumDbContext>().ToSelf().InRequestScope();
-            kernel.Bind<UnitOfWork>().ToSelf();
+            kernel.Bind<IDatabase>().To<Database>();
             kernel.Bind<IUserStore<User, int>>().To<UserStore<User, Role, int, UserLogin, UserRole, UserClaim>>();
             kernel.Bind<ApplicationUserManager>().ToSelf();
             kernel.Bind<ApplicationSignInManager>().ToSelf();

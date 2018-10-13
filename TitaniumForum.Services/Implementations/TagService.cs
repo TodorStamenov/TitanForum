@@ -1,36 +1,31 @@
 ﻿namespace TitaniumForum.Services.Implementations
 {
-    using AutoMapper.QueryableExtensions;
-    using Data;
+    using Data.Contracts;
     using Models.Tags;
     using System.Collections.Generic;
     using System.Linq;
 
-    public class TagService : ITagService
+    public class TagService : Service, ITagService
     {
-        private readonly UnitOfWork db;
-
-        public TagService(UnitOfWork db)
+        public TagService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public bool Exists(int id)
         {
-            return this.db
+            return this.Database
                 .Tags
-                .Get()
                 .Any(t => t.Id == id);
         }
 
         public IEnumerable<ListTagsServiceModel> ByQuestion(int questionId)
         {
-            return this.db
+            return this.Database
                 .Tags
-                .Get(filter: t => t.Questions.Any(q => q.QuestionId == questionId))
-                .AsQueryable()
-                .ProjectTo<ListTagsServiceModel>()
-                .ToList();
+                .Project(
+                    projection: t => new ListTagsServiceModel { Id = t.Id, Name = t.Name },
+                    filter: t => t.Questions.Any(q => q.QuestionId == questionId));
         }
     }
 }

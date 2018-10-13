@@ -1,11 +1,9 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator.Models.Categories
 {
-    using Common.Mapping;
-    using Data.Models;
     using SubCategories;
     using System.Collections.Generic;
 
-    public class ListCategoriesServiceModel : IMapFrom<Category>
+    public class ListCategoriesServiceModel
     {
         public int Id { get; set; }
 

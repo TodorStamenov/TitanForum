@@ -1,65 +1,61 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator.Implementations
 {
-    using AutoMapper.QueryableExtensions;
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Models.Categories;
+    using Services.Areas.Moderator.Models.SubCategories;
+    using Services.Implementations;
     using Services.Models.Categories;
     using Services.Models.SubCategories;
     using System.Collections.Generic;
     using System.Linq;
 
-    public class CategoryService : ICategoryService
+    public class CategoryService : Service, ICategoryService
     {
-        private readonly UnitOfWork db;
-
-        public CategoryService(UnitOfWork db)
+        public CategoryService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public bool Exists(int id)
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get()
                 .Any(sc => sc.Id == id);
         }
 
         public bool IsDeleted(int id)
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get(filter: c => c.Id == id)
-                .Select(c => c.IsDeleted)
-                .FirstOrDefault();
+                .Any(c => c.Id == id && c.IsDeleted);
         }
 
         public bool HasQuestions(int id)
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get(filter: c => c.Id == id)
-                .SelectMany(c => c.SubCategories.SelectMany(sc => sc.Questions))
-                .Where(q => !q.IsDeleted)
-                .Any();
+                .Any(c => c.Id == id
+                    && c.SubCategories
+                        .SelectMany(sc => sc.Questions)
+                        .Where(q => !q.IsDeleted)
+                        .Any());
         }
 
         public bool NameExists(string name)
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get()
                 .Any(c => c.Name == name);
         }
 
         public string GetName(int id)
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get(filter: c => c.Id == id)
-                .Select(c => c.Name)
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: c => c.Name,
+                    filter: c => c.Id == id);
         }
 
         public bool Create(string name)
@@ -74,15 +70,15 @@
                 Name = name
             };
 
-            this.db.Categories.Add(category);
-            this.db.Save();
+            this.Database.Categories.Add(category);
+            this.Database.Save();
 
             return true;
         }
 
         public bool Edit(int id, string name)
         {
-            Category category = this.db.Categories.Find(id);
+            Category category = this.Database.Categories.Find(id);
 
             if (category == null
                 || (this.NameExists(name)
@@ -93,14 +89,14 @@
 
             category.Name = name;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Delete(int id)
         {
-            Category category = this.db.Categories.Find(id);
+            Category category = this.Database.Categories.Find(id);
 
             if (category == null
                 || category.IsDeleted)
@@ -130,14 +126,14 @@
                 subCategory.IsDeleted = true;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Restore(int id)
         {
-            Category category = this.db.Categories.Find(id);
+            Category category = this.Database.Categories.Find(id);
 
             if (category == null
                 || !category.IsDeleted)
@@ -147,50 +143,58 @@
 
             category.IsDeleted = false;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public CategoryFormServiceModel GetForm(int id)
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get(filter: c => c.Id == id)
-                .AsQueryable()
-                .ProjectTo<CategoryFormServiceModel>()
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: c => new CategoryFormServiceModel { Name = c.Name },
+                    filter: c => c.Id == id);
         }
 
         public IEnumerable<MenuCategoryServiceModel> GetMenu()
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get(filter: c => !c.IsDeleted
-                    && c.SubCategories.Any(sc => sc.Questions.Any(q => !q.IsDeleted)))
-                .Select(c => new MenuCategoryServiceModel
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    SubCategories = c.SubCategories
-                        .Where(sc => !sc.IsDeleted)
-                        .Select(sc => new MenuSubCategoryServiceModel
-                        {
-                            Id = sc.Id,
-                            Name = sc.Name
-                        })
-                })
-                .ToList();
+                .Project(
+                    projection: c => new MenuCategoryServiceModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        SubCategories = c.SubCategories
+                            .Where(sc => !sc.IsDeleted)
+                            .Select(sc => new MenuSubCategoryServiceModel
+                            {
+                                Id = sc.Id,
+                                Name = sc.Name
+                            })
+                    },
+                    filter: c => !c.IsDeleted
+                        && c.SubCategories.Any(sc => sc.Questions.Any(q => !q.IsDeleted)));
         }
 
         public IEnumerable<ListCategoriesServiceModel> All()
         {
-            return this.db
+            return this.Database
                 .Categories
-                .Get()
-                .AsQueryable()
-                .ProjectTo<ListCategoriesServiceModel>()
-                .ToList();
+                .Project(c => new ListCategoriesServiceModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    IsDeleted = c.IsDeleted,
+                    SubCategories = c.SubCategories
+                        .Select(s => new ListSubCategoriesServiceModel
+                        {
+                            Id = s.Id,
+                            Name = s.Name,
+                            IsDeleted = s.IsDeleted
+                        })
+                });
         }
     }
 }

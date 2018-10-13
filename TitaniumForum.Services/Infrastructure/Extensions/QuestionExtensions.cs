@@ -8,20 +8,6 @@
 
     public static class QuestionExtensions
     {
-        public static IEnumerable<Question> Filter(this IEnumerable<Question> questions, string searchTerm)
-        {
-            if (!string.IsNullOrEmpty(searchTerm)
-                && !string.IsNullOrWhiteSpace(searchTerm))
-            {
-                return questions
-                    .Where(q => q.Title.ToLower().Contains(searchTerm)
-                    || q.Content.ToLower().Contains(searchTerm)
-                    || q.Tags.Any(t => t.Tag.Name.ToLower().Contains(searchTerm)));
-            }
-
-            return questions;
-        }
-
         public static IEnumerable<ListQuestionsServiceModel> ProjectToListModel(this IEnumerable<Question> questions)
         {
             return questions

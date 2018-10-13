@@ -1,33 +1,33 @@
 ﻿namespace TitaniumForum.Services.Areas.Moderator.Implementations
 {
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Infrastructure.Extensions;
     using Models.Comments;
+    using Services.Implementations;
     using System.Collections.Generic;
     using System.Linq;
 
-    public class ModeratorCommentService : IModeratorCommentService
+    public class ModeratorCommentService : Service, IModeratorCommentService
     {
-        private readonly UnitOfWork db;
-
-        public ModeratorCommentService(UnitOfWork db)
+        public ModeratorCommentService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public int DeletedCount(string search)
         {
-            return this.db
+            return this.Database
                 .Comments
-                .Get(filter: c => c.IsDeleted)
-                .Filter(search)
-                .Count();
+                .Count(c => c.IsDeleted
+                    && (!string.IsNullOrEmpty(search)
+                        ? c.Content.ToLower().Contains(search.ToLower())
+                        : true));
         }
 
         public bool Delete(int id)
         {
-            Comment comment = this.db.Comments.Find(id);
+            Comment comment = this.Database.Comments.Find(id);
 
             if (comment == null
                 || comment.IsDeleted)
@@ -37,14 +37,14 @@
 
             comment.IsDeleted = true;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Restore(int id)
         {
-            Comment comment = this.db.Comments.Find(id);
+            Comment comment = this.Database.Comments.Find(id);
 
             if (comment == null
                 || !comment.IsDeleted
@@ -55,21 +55,23 @@
 
             comment.IsDeleted = false;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public IEnumerable<ListDeletedCommentsServiceModel> Deleted(int page, int pageSize, string search)
         {
-            return this.db
+            return this.Database
                 .Comments
-                .Get(filter: c => c.IsDeleted)
-                .Filter(search)
-                .OrderByDescending(c => c.DateAdded)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .AsEnumerable()
+                .Get(
+                    filter: c => c.IsDeleted
+                        && (!string.IsNullOrEmpty(search)
+                            ? c.Content.ToLower().Contains(search.ToLower())
+                            : true),
+                    orderBy: e => e.OrderByDescending(c => c.DateAdded),
+                    skip: (page - 1) * pageSize,
+                    take: pageSize)
                 .Select(c => new ListDeletedCommentsServiceModel
                 {
                     Id = c.Id,

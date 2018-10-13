@@ -1,41 +1,38 @@
 ﻿namespace TitaniumForum.Services.Implementations
 {
-    using AutoMapper.QueryableExtensions;
-    using Data;
+    using Data.Contracts;
     using Data.Models;
     using Models.Comments;
     using System;
     using System.Linq;
 
-    public class CommentService : ICommentService
+    public class CommentService : Service, ICommentService
     {
-        private readonly UnitOfWork db;
-
-        public CommentService(UnitOfWork db)
+        public CommentService(IDatabase database)
+            : base(database)
         {
-            this.db = db;
         }
 
         public bool CanEdit(int id, int userId)
         {
-            return this.db
+            return this.Database
                 .Comments
-                .Get()
-                .Any(c => c.Id == id && c.AuthorId == userId);
+                .Any(c => c.Id == id
+                    && c.AuthorId == userId);
         }
 
         public bool Create(int answerId, int authorId, string content)
         {
-            var answerInfo = this.db
+            var answerInfo = this.Database
                 .Answers
-                .Get(filter: a => a.Id == answerId)
-                .Select(a => new
-                {
-                    a.IsDeleted,
-                    IsQuestionDeleted = a.Question.IsDeleted,
-                    IsQuestionLocked = a.Question.IsLocked
-                })
-                .FirstOrDefault();
+                .ProjectSingle(
+                    projection: a => new
+                    {
+                        a.IsDeleted,
+                        IsQuestionDeleted = a.Question.IsDeleted,
+                        IsQuestionLocked = a.Question.IsLocked
+                    },
+                    filter: a => a.Id == answerId);
 
             if (answerInfo == null
                 || answerInfo.IsDeleted
@@ -53,15 +50,15 @@
                 DateAdded = DateTime.UtcNow
             };
 
-            this.db.Comments.Add(comment);
-            this.db.Save();
+            this.Database.Comments.Add(comment);
+            this.Database.Save();
 
             return true;
         }
 
         public bool Edit(int id, string content)
         {
-            Comment comment = this.db.Comments.Find(id);
+            Comment comment = this.Database.Comments.Find(id);
 
             if (comment == null
                 || comment.Answer.IsDeleted
@@ -73,14 +70,14 @@
 
             comment.Content = content;
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public bool Vote(int id, int userId, Direction voteDirection)
         {
-            Comment comment = this.db.Comments.Find(id);
+            Comment comment = this.Database.Comments.Find(id);
 
             if (comment == null
                 || comment.IsDeleted
@@ -106,23 +103,21 @@
                 user.Rating--;
             }
 
-            this.db.Save();
+            this.Database.Save();
 
             return true;
         }
 
         public CommentFormServiceModel GetForm(int id)
         {
-            return this.db
+            return this.Database
                 .Comments
-                .Get(
+                .ProjectSingle(
+                    projection: c => new CommentFormServiceModel { AnswerId = c.AnswerId, Content = c.Content },
                     filter: c => c.Id == id
                         && !c.Answer.IsDeleted
                         && !c.Answer.Question.IsDeleted
-                        && !c.Answer.Question.IsLocked)
-                .AsQueryable()
-                .ProjectTo<CommentFormServiceModel>()
-                .FirstOrDefault();
+                        && !c.Answer.Question.IsLocked);
         }
     }
 }

@@ -12,7 +12,7 @@
         public TitaniumForumDbContext()
             : base("data source=.;initial catalog=TitaniumForum;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<TitaniumForumDbContext, Configuration>());
+            System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<TitaniumForumDbContext, Configuration>());
         }
 
         public DbSet<Category> Categories { get; set; }

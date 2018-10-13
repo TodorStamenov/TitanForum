@@ -1,9 +1,6 @@
 ﻿namespace TitaniumForum.Services.Models.Users
 {
-    using Common.Mapping;
-    using Data.Models;
-
-    public class ListUsersServiceModel : IMapFrom<User>
+    public class ListUsersServiceModel
     {
         public int Id { get; set; }
 

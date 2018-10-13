@@ -15,6 +15,7 @@
         private const int QuestionsPerPage = 5;
         private const int ReportedQuestionsCount = 5;
         private const string All = "All";
+        private const string Index = "Index";
         private const string Details = "Details";
         private const string Question = "Question";
         private const string Questions = "Questions";
@@ -144,7 +145,7 @@
                 WebConstants.Deleted));
 
             return RedirectToAction(
-                All,
+                Index,
                 Questions,
                 new { area = string.Empty });
         }

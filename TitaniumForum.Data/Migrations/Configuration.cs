@@ -66,8 +66,8 @@ namespace TitaniumForum.Data.Migrations
             {
                 await this.SeedRolesAsync(roleManager, context);
                 await this.SeedUsersAsync(userManager, UsersCount, context);
-                await this.SeedUsersAsync(userManager, roleManager, AdminsCount, CommonConstants.AdminRole, context);
-                await this.SeedUsersAsync(userManager, roleManager, ModeratorsCount, CommonConstants.ModeratorRole, context);
+                await this.SeedUsersAsync(userManager, AdminsCount, CommonConstants.AdminRole, context);
+                await this.SeedUsersAsync(userManager, ModeratorsCount, CommonConstants.ModeratorRole, context);
                 await this.SeedCategoriesAsync(CategoriesCount, context);
                 await this.SeedSubCategoriesAsync(SubCategoriesCount, context);
                 await this.SeedTagsAsync(TagsCount, context);
@@ -115,7 +115,7 @@ namespace TitaniumForum.Data.Migrations
             }
         }
 
-        private async Task SeedUsersAsync(UserManager<User, int> userManager, RoleManager<Role, int> roleManager, int usersCount, string role, TitaniumForumDbContext context)
+        private async Task SeedUsersAsync(UserManager<User, int> userManager, int usersCount, string role, TitaniumForumDbContext context)
         {
             if (await context.Users.AnyAsync(u => u.Roles.Any(r => r.Role.Name == role)))
             {
