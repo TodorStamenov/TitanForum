@@ -2,55 +2,39 @@
 {
     using Contracts;
     using Models;
-    using Repositories;
-    using System;
-    using System.Collections.Generic;
+    using TitaniumForum.Data.Repositories;
 
     public class Database : IDatabase
     {
         private readonly TitaniumForumDbContext context;
-        private readonly IDictionary<Type, object> repositories;
 
         public Database(TitaniumForumDbContext context)
         {
             this.context = context;
-            this.repositories = new Dictionary<Type, object>();
         }
 
-        public IRepository<Category> Categories => this.GetRepository<Category>();
+        public IRepository<Category> Categories => new Repository<Category>(this.context);
 
-        public IRepository<SubCategory> SubCategories => this.GetRepository<SubCategory>();
+        public IRepository<SubCategory> SubCategories => new Repository<SubCategory>(this.context);
 
-        public IRepository<Question> Questions => this.GetRepository<Question>();
+        public IRepository<Question> Questions => new Repository<Question>(this.context);
 
-        public IRepository<Answer> Answers => this.GetRepository<Answer>();
+        public IRepository<Answer> Answers => new Repository<Answer>(this.context);
 
-        public IRepository<Comment> Comments => this.GetRepository<Comment>();
+        public IRepository<Comment> Comments => new Repository<Comment>(this.context);
 
-        public IRepository<Tag> Tags => this.GetRepository<Tag>();
+        public IRepository<Tag> Tags => new Repository<Tag>(this.context);
 
-        public IRepository<User> Users => this.GetRepository<User>();
+        public IRepository<User> Users => new Repository<User>(this.context);
 
-        public IRepository<Role> Roles => this.GetRepository<Role>();
+        public IRepository<Role> Roles => new Repository<Role>(this.context);
 
-        public IRepository<UserRole> UserRoles => this.GetRepository<UserRole>();
+        public IRepository<UserRole> UserRoles => new Repository<UserRole>(this.context);
 
-        public IRepository<Log> Logs => this.GetRepository<Log>();
+        public IRepository<Log> Logs => new Repository<Log>(this.context);
 
         public void Save() => this.context.SaveChanges();
 
         public void Dispose() => this.context.Dispose();
-
-        private IRepository<T> GetRepository<T>() where T : class, new()
-        {
-            Type repositoryType = typeof(T);
-
-            if (!this.repositories.ContainsKey(repositoryType))
-            {
-                this.repositories[repositoryType] = (IRepository<T>)Activator.CreateInstance(typeof(Repository<T>), this.context);
-            }
-
-            return (IRepository<T>)this.repositories[repositoryType];
-        }
     }
 }
